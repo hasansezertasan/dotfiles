@@ -37,8 +37,8 @@ fi
 # "System Preferences" was renamed "System Settings" in macOS 13
 osascript -e 'tell application "System Settings" to quit' 2> /dev/null
 
-# Ask for the administrator password upfront
-sudo -v
+# Ask for the administrator password upfront; a partial run is worse than none
+sudo -v || exit 1
 
 # Keep-alive: update existing `sudo` time stamp until this script has finished
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
@@ -333,7 +333,7 @@ defaults write com.apple.mail PlayMailSounds -bool false
 # Mark all messages as read when opening a conversation
 defaults write com.apple.mail ConversationViewMarkAllAsRead -bool true
 
-# Disable includings results from trash in search
+# Disable including results from trash in search
 defaults write com.apple.mail IndexTrash -bool false
 
 # Automatically check for new message (not every 5 minutes)
@@ -357,12 +357,16 @@ defaults write com.apple.iCal "first day of week" -int 1
 # Terminal                                                                    #
 ###############################################################################
 
+# Terminal is not in the restart list below: this script is normally run from
+# Terminal, so killing it would kill the script. Relaunch it manually for these
+# to take effect.
+
 # Only use UTF-8 in Terminal.app
-defaults write com.apple.terminal StringEncodings -array 4
+defaults write com.apple.Terminal StringEncodings -array 4
 
 # Appearance
-defaults write com.apple.terminal "Default Window Settings" -string "Pro"
-defaults write com.apple.terminal "Startup Window Settings" -string "Pro"
+defaults write com.apple.Terminal "Default Window Settings" -string "Pro"
+defaults write com.apple.Terminal "Startup Window Settings" -string "Pro"
 defaults write com.apple.Terminal ShowLineMarks -int 0
 
 ###############################################################################
@@ -437,6 +441,6 @@ duti -s dev.zed.Zed public.plain-text all
 # Kill affected applications                                                  #
 ###############################################################################
 
-for app in "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal"; do
+for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal"; do
   killall "${app}" &> /dev/null || true
 done
