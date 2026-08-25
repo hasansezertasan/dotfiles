@@ -34,6 +34,10 @@ if [ ${#MISSING_COMMANDS[@]} -ne 0 ]; then
   exit 1
 fi
 
+# Set by the mutating commands below when they fail, and returned at exit so a
+# partial bootstrap is distinguishable from a clean one
+EXIT_STATUS=0
+
 # "System Preferences" was renamed "System Settings" in macOS 13
 osascript -e 'tell application "System Settings" to quit' 2> /dev/null
 
@@ -302,7 +306,7 @@ defaults write com.apple.dock wvous-br-corner -int 0
 # Don't show recently used applications in the Dock
 defaults write com.apple.dock show-recents -bool false
 
-dockutil --no-restart --remove all
+dockutil --no-restart --remove all || EXIT_STATUS=1
 
 ###############################################################################
 # Mail                                                                        #
@@ -412,30 +416,17 @@ defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
 # File Associations                                                           #
 ###############################################################################
 
-duti -s dev.zed.Zed .cfg all
-duti -s dev.zed.Zed .flake8 all
-duti -s dev.zed.Zed .gitattributes all
-duti -s dev.zed.Zed .gitignore all
-duti -s dev.zed.Zed .in all
-duti -s dev.zed.Zed .ini all
-duti -s dev.zed.Zed .js all
-duti -s dev.zed.Zed .json all
-duti -s dev.zed.Zed .jsonl all
-duti -s dev.zed.Zed .jsonc all
-duti -s dev.zed.Zed .lock all
-duti -s dev.zed.Zed .md all
-duti -s dev.zed.Zed .opml all
-duti -s dev.zed.Zed .py all
-duti -s dev.zed.Zed .python-version all
-duti -s dev.zed.Zed .rst all
-duti -s dev.zed.Zed .toml all
-duti -s dev.zed.Zed .ts all
-duti -s dev.zed.Zed .txt all
-duti -s dev.zed.Zed .xml all
-duti -s dev.zed.Zed .yaml all
-duti -s dev.zed.Zed .yml all
-# Extensionless files are content-sniffed as public.plain-text (LICENSE, etc.)
-duti -s dev.zed.Zed public.plain-text all
+# Extensions, plus the UTI that extensionless files (LICENSE, etc.) are
+# content-sniffed as
+ZED_FILE_TYPES=(
+  .cfg .flake8 .gitattributes .gitignore .in .ini .js .json .jsonl .jsonc
+  .lock .md .opml .py .python-version .rst .toml .ts .txt .xml .yaml .yml
+  public.plain-text
+)
+
+for file_type in "${ZED_FILE_TYPES[@]}"; do
+  duti -s dev.zed.Zed "${file_type}" all || EXIT_STATUS=1
+done
 
 ###############################################################################
 # Kill affected applications                                                  #
@@ -444,3 +435,5 @@ duti -s dev.zed.Zed public.plain-text all
 for app in "Activity Monitor" "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal"; do
   killall "${app}" &> /dev/null || true
 done
+
+exit "${EXIT_STATUS}"
