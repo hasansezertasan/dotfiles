@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 COMPUTER_NAME="hasansezertasan"
 LANGUAGES=(en tr)
 LOCALE="en_US@currency=USD"
@@ -20,7 +22,20 @@ SCREENSHOTS_FOLDER="${HOME}/Screenshots"
 # - Activity Monitor
 # - Software Updates
 
-osascript -e 'tell application "System Preferences" to quit'
+# Third-party tools used below; fail before changing anything if they're absent
+REQUIRED_COMMANDS=(dockutil duti)
+MISSING_COMMANDS=()
+for cmd in "${REQUIRED_COMMANDS[@]}"; do
+  command -v "${cmd}" > /dev/null 2>&1 || MISSING_COMMANDS+=("${cmd}")
+done
+if [ ${#MISSING_COMMANDS[@]} -ne 0 ]; then
+  echo "Missing required command(s): ${MISSING_COMMANDS[*]}" >&2
+  echo "Install them first: brew install ${MISSING_COMMANDS[*]}" >&2
+  exit 1
+fi
+
+# "System Preferences" was renamed "System Settings" in macOS 13
+osascript -e 'tell application "System Settings" to quit' 2> /dev/null
 
 # Ask for the administrator password upfront
 sudo -v
@@ -43,7 +58,7 @@ sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.serve
 ###############################################################################
 
 # Set language and text formats
-defaults write NSGlobalDomain AppleLanguages -array ${LANGUAGES[@]}
+defaults write NSGlobalDomain AppleLanguages -array "${LANGUAGES[@]}"
 # defaults write NSGlobalDomain AppleLocale -string "$LOCALE"
 # defaults write NSGlobalDomain AppleMeasurementUnits -string "$MEASUREMENT_UNITS"
 # defaults write NSGlobalDomain AppleMetricUnits -bool true
@@ -76,7 +91,9 @@ defaults write NSGlobalDomain AppleLanguages -array ${LANGUAGES[@]}
 # sudo nvram StartupMute=%01
 
 # Menu bar: show battery percentage
-defaults write com.apple.menuextra.battery ShowPercent YES
+# Lives in Control Center's per-host domain since Big Sur; the old
+# com.apple.menuextra.battery ShowPercent key is a no-op
+defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
 
 # Disable opening and closing window animations
 defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
@@ -108,7 +125,9 @@ defaults write com.apple.systempreferences NSQuitAlwaysKeepsWindows -bool false
 defaults write com.apple.CrashReporter DialogType -string "none"
 
 # Disable Notification Center and remove the menu bar icon
-launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
+# Unloading agents under /System/Library is blocked by SIP, so this can't work
+# on a stock machine; left here only to document the intent
+# launchctl unload -w /System/Library/LaunchAgents/com.apple.notificationcenterui.plist 2> /dev/null
 
 ###############################################################################
 # Keyboard & Input                                                            #
@@ -129,11 +148,11 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 15
 
-# Automatically illuminate built-in MacBook keyboard in low light
-defaults write com.apple.BezelServices kDim -bool true
-
-# Turn off keyboard illumination when computer is not used for 5 minutes
-defaults write com.apple.BezelServices kDimTime -int 300
+# Keyboard backlight: com.apple.BezelServices only applies to pre-2013 Macs.
+# Modern hardware exposes these under System Settings > Keyboard with no
+# scriptable defaults key.
+# defaults write com.apple.BezelServices kDim -bool true
+# defaults write com.apple.BezelServices kDimTime -int 300
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
@@ -265,7 +284,7 @@ defaults write com.apple.dock show-process-indicators -bool true
 # Don't animate opening applications from the Dock
 defaults write com.apple.dock launchanim -bool false
 
-# Automatically hide and show the Dock
+# Keep the Dock permanently visible (don't auto-hide)
 defaults write com.apple.dock autohide -bool false
 
 # Make Dock icons of hidden applications translucent
@@ -281,7 +300,7 @@ defaults write com.apple.dock wvous-bl-corner -int 0
 defaults write com.apple.dock wvous-br-corner -int 0
 
 # Don't show recently used applications in the Dock
-defaults write com.Apple.Dock show-recents -bool false
+defaults write com.apple.dock show-recents -bool false
 
 dockutil --no-restart --remove all
 
@@ -371,7 +390,7 @@ defaults write com.apple.ActivityMonitor SortDirection -int 0
 defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
 
 # Check for software updates weekly (`dot update` includes software updates)
-defaults write com.apple.SoftwareUpdate ScheduleFrequency -string 7
+defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 7
 
 # Download newly available updates in background
 defaults write com.apple.SoftwareUpdate AutomaticDownload -bool true
@@ -411,12 +430,13 @@ duti -s dev.zed.Zed .txt all
 duti -s dev.zed.Zed .xml all
 duti -s dev.zed.Zed .yaml all
 duti -s dev.zed.Zed .yml all
-duti -s dev.zed.Zed LICENSE all
+# Extensionless files are content-sniffed as public.plain-text (LICENSE, etc.)
+duti -s dev.zed.Zed public.plain-text all
 
 ###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
 for app in "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal"; do
-  killall "${app}" &> /dev/null
+  killall "${app}" &> /dev/null || true
 done
