@@ -4,30 +4,16 @@ Personal macOS configuration, managed with GNU Stow.
 
 ## Setup
 
-With Homebrew and Git available, install the command-line dependencies used by
-the link script and configured Zsh plugins:
+With Homebrew, Git, and Zsh available, run:
 
 ```sh
-brew install stow starship zoxide mise
+./bootstrap.sh
 ```
 
-Install Oh My Zsh when it is not already present:
-
-```sh
-omz_dir="${ZSH:-${HOME}/.oh-my-zsh}"
-if [[ -r "${omz_dir}/oh-my-zsh.sh" ]]; then
-  echo "Oh My Zsh is already installed at ${omz_dir}"
-elif [[ -e "${omz_dir}" || -L "${omz_dir}" ]]; then
-  echo "Cannot install Oh My Zsh: ${omz_dir} already exists" >&2
-else
-  git clone https://github.com/ohmyzsh/ohmyzsh.git "${omz_dir}"
-fi
-unset omz_dir
-```
-
-Cloning the framework directly avoids creating or replacing the `.zshrc`
-managed by this repository. An existing target is preserved and reported as a
-conflict unless it contains a readable `oh-my-zsh.sh` installation.
+The bootstrap installs missing Homebrew formulae, checks for symlink conflicts,
+clones Oh My Zsh when needed, activates the managed links, and applies the macOS
+settings below. It preserves valid existing installations and refuses to
+overwrite conflicting paths.
 
 ## Symlinks
 
@@ -68,8 +54,9 @@ available to every Zsh process, including non-interactive shells.
 
 ## macOS settings
 
-`bootstrap.sh` applies macOS preferences. It is executable configuration, not a
-dotfile, and is therefore not part of any Stow package.
+After installing shell dependencies and links, `bootstrap.sh` applies macOS
+preferences. It is executable configuration, not a dotfile, and is therefore
+not part of any Stow package.
 
 ## Agent skills
 

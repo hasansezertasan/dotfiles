@@ -97,14 +97,17 @@ and [Starship prerequisites](https://starship.rs/guide/#prerequisites).
 
 1. Verify `zsh`, `git`, and `brew` are available.
 2. Install `starship`, `zoxide`, and `mise` with Homebrew.
-3. Install the repository's Stow links.
+3. Preview the repository's Stow links and stop on conflicts.
 4. If `${ZSH:-${HOME}/.oh-my-zsh}` is absent, clone the official Oh My Zsh
    repository there. Treat an existing directory without a readable
    `oh-my-zsh.sh` as a conflict rather than overwriting it.
-5. Validate with a fresh interactive Zsh process.
+5. Install the repository's Stow links.
+6. Apply the macOS preferences and validate with a fresh interactive Zsh
+   process.
 
-This preserves the Stow-owned `.zshrc`, avoids unnecessary installer side
-effects and duplicate clones, and makes repeated repository setup runs safe.
-The guarded installer command remains a valid alternative, but direct cloning
-is preferable because the repository already supplies every configuration step
-that the installer would otherwise perform.
+Implement these steps in `bootstrap.sh`. This preserves the Stow-owned `.zshrc`,
+avoids unnecessary installer side effects and duplicate clones, and makes
+repeated repository setup runs safe. The guarded installer command remains a
+valid alternative, but direct cloning is preferable because the repository
+already supplies every configuration step that the installer would otherwise
+perform.
