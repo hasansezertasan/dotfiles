@@ -27,3 +27,7 @@ files when needed.
 * Good, because updates produce focused lockfile diffs.
 * Bad, because a fresh checkout requires a restore command before project skills
   are available locally.
+
+## Related Research
+
+* [MADR skill selection](../research/0002-madr-skill-selection.md)

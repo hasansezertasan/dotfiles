@@ -35,3 +35,7 @@ configuration. The link script names packages explicitly and uses
   outside the repository.
 * Bad, because GNU Stow is an installation prerequisite.
 * Bad, because an existing target requires an explicit backup or migration.
+
+## Related Research
+
+* [Dotfile symlink patterns in popular repositories](../research/0001-dotfiles-symlink-patterns.md)
