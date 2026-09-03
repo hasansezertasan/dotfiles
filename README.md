@@ -27,8 +27,13 @@ brew bundle upgrade --file Brewfile
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `claude` and `zsh`; it intentionally does not discover packages so that
-adding a directory to the repository cannot unexpectedly change `$HOME`.
+manages `claude`, `git`, and `zsh`; it intentionally does not discover packages
+so that adding a directory to the repository cannot unexpectedly change `$HOME`.
+
+`~/.config/gh`, `~/.config/zed`, `~/.config/atuin`, and `~/.config/mise` are
+candidates for future packages. They are unmanaged for now because each needs
+checking first: `gh/hosts.yml` holds an authentication token, and the rest are
+rewritten by their own applications rather than only by hand.
 
 Preview changes before installing:
 
@@ -50,6 +55,20 @@ directories available for application-owned state.
 
 Existing files and incorrect links are treated as conflicts. The script never
 overwrites or adopts them; move or back them up explicitly, then rerun it.
+
+### Git
+
+The `git` package links `~/.gitconfig`. Git resolves the symlink when writing,
+so `git config --global` edits the tracked file in place and shows up as a
+repository change instead of replacing the link.
+
+An existing `~/.gitconfig` is a conflict like any other target. Move it aside
+once, then install:
+
+```sh
+mv ~/.gitconfig ~/.gitconfig.backup
+./link.sh install
+```
 
 ### Zsh
 
