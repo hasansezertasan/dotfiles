@@ -93,15 +93,21 @@ not part of any Stow package.
 
 ## Checks
 
-`bootstrap.sh` and `link.sh` are checked with ShellCheck:
+Tracked shell scripts are checked with ShellCheck, and the Zsh package gets a
+parse-only check:
 
 ```sh
-shellcheck ./*.sh
+git ls-files -z '*.sh' | xargs -0 shellcheck
+git ls-files -z 'zsh/.zshrc' 'zsh/*.zsh' | xargs -0 -n1 zsh -n
 ```
 
-The `CI` workflow runs the same command on every push to `main` and on every
-pull request. Zsh files under `zsh/` are not covered; ShellCheck does not
-support the Zsh dialect.
+The `CI` workflow runs both commands on every push to `main` and on every pull
+request. Each uses a pathspec rather than a fixed file list, so a new script or
+Zsh fragment is covered without editing the workflow.
+
+`zsh -n` needs one invocation per file. It reads a single script and treats any
+further arguments as positional parameters, so passing several files at once
+would silently check only the first — hence `xargs -n1`.
 
 ## Agent skills
 
