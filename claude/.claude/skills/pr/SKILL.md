@@ -121,9 +121,9 @@ It expects to run as tool calls in a single message with no commentary, which is
 what a fully-decided situation allows. Use the names from step 2 verbatim — the commit
 subject, the branch, and the PR title were chosen together and should stay identical.
 
-If the pre-flight found a PR **already open** for this branch, skip the command: push
-the branch and report the existing PR's URL instead. Two PRs for one branch is a mess
-to unpick.
+If the pre-flight found a PR **already open** for this branch, do not create another
+PR. Keep the command's commit and push operations, omit only `gh pr create`, and report
+the existing PR's URL. Two PRs for one branch is a mess to unpick.
 
 ## After
 
