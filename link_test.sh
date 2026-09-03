@@ -11,12 +11,18 @@ readonly DOTFILES_DIR
 # Paths the packages are expected to place in the target directory.
 readonly -a EXPECTED_LINKS=(
   .claude/CLAUDE.md
+  .codex/hooks.json
   .config/atuin/config.toml
   .config/gh/config.yml
   .config/mise/config.toml
+  .config/olink/pins.json
+  .config/opencode/opencode.jsonc
+  .config/opencode/package.json
+  .config/zed/settings.json
   .config/zsh/conf.d/00-path.zsh
   .config/zsh/conf.d/10-oh-my-zsh.zsh
   .gitconfig
+  .ssh/config
   .zshrc
 )
 
@@ -24,12 +30,17 @@ readonly -a EXPECTED_LINKS=(
 # their own state alongside the managed files.
 readonly -a EXPECTED_DIRS=(
   .claude
+  .codex
   .config
   .config/atuin
   .config/gh
   .config/mise
+  .config/olink
+  .config/opencode
+  .config/zed
   .config/zsh
   .config/zsh/conf.d
+  .ssh
 )
 
 failures=0

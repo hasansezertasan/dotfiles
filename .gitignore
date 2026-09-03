@@ -2,3 +2,24 @@
 
 # gh stores the auth token here when no system keyring is available.
 gh/.config/gh/hosts.yml
+
+# Keep private keys and machine-maintained SSH data out if the package is
+# populated from an existing ~/.ssh directory.
+ssh/.ssh/*
+!ssh/.ssh/config
+
+# Codex keeps credentials, histories, databases, sessions, caches, and mutable
+# config.toml state beside the portable hook definition.
+codex/.codex/*
+!codex/.codex/hooks.json
+
+# OpenCode installs dependencies and the Open Island integration locally.
+opencode/.config/opencode/node_modules/
+opencode/.config/opencode/package-lock.json
+opencode/.config/opencode/config.json
+opencode/.config/opencode/open-island-opencode-plugin-install.json
+opencode/.config/opencode/plugins/
+
+# Zed keeps its prompt database and other mutable data beside settings.json.
+zed/.config/zed/*
+!zed/.config/zed/settings.json

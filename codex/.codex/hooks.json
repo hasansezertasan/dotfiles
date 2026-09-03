@@ -1,0 +1,92 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "hook=\"$HOME/.orca/agent-hooks/codex-hook.sh\"; if [ -f \"$hook\" ] && [ -r \"$hook\" ] && [ -x \"$hook\" ]; then /bin/sh \"$hook\"; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
