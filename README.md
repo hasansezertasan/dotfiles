@@ -10,10 +10,19 @@ With Homebrew, Git, and Zsh available, run:
 ./bootstrap.sh
 ```
 
-The bootstrap installs missing Homebrew formulae, checks for symlink conflicts,
-clones Oh My Zsh when needed, activates the managed links, and applies the macOS
-settings below. It preserves valid existing installations and refuses to
-overwrite conflicting paths.
+The bootstrap installs the `Brewfile` dependencies, checks for symlink
+conflicts, clones Oh My Zsh when needed, activates the managed links, and
+applies the macOS settings below. It preserves valid existing installations and
+refuses to overwrite conflicting paths.
+
+Homebrew packages are declared in the repository's `Brewfile` and installed with
+`brew bundle`. The bootstrap passes `--no-upgrade`, so already-installed
+formulae keep their current version. Inspect or upgrade them directly with:
+
+```sh
+brew bundle check --file Brewfile
+brew bundle upgrade --file Brewfile
+```
 
 ## Symlinks
 

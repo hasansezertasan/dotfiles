@@ -96,7 +96,9 @@ and [Starship prerequisites](https://starship.rs/guide/#prerequisites).
 ## Recommended bootstrap behavior
 
 1. Verify `zsh`, `git`, and `brew` are available.
-2. Install `starship`, `zoxide`, and `mise` with Homebrew.
+2. Install `starship`, `zoxide`, and `mise` with Homebrew. Declare them in the
+   repository's `Brewfile` so `brew bundle` installs them alongside the other
+   required packages.
 3. Preview the repository's Stow links and stop on conflicts.
 4. If `${ZSH:-${HOME}/.oh-my-zsh}` is absent, clone the official Oh My Zsh
    repository there. Treat an existing directory without a readable

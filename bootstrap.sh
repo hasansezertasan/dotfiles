@@ -39,16 +39,10 @@ if [ ${#MISSING_PREREQUISITES[@]} -ne 0 ]; then
   exit 1
 fi
 
-# Install commands used by the bootstrap, link manager, and Zsh plugins.
-FORMULAE=(dockutil duti mise starship stow zoxide)
-MISSING_FORMULAE=()
-for formula in "${FORMULAE[@]}"; do
-  brew list --formula "${formula}" > /dev/null 2>&1 ||
-    MISSING_FORMULAE+=("${formula}")
-done
-if [ ${#MISSING_FORMULAE[@]} -ne 0 ]; then
-  brew install "${MISSING_FORMULAE[@]}" || exit 1
-fi
+# Install the commands declared in the Brewfile. `--no-upgrade` keeps the
+# bootstrap additive: already-installed formulae are left at their current
+# version instead of being upgraded as a side effect of running this script.
+brew bundle install --file "${DOTFILES_DIR}/Brewfile" --no-upgrade || exit 1
 
 # Detect link conflicts before installing any framework files.
 "${DOTFILES_DIR}/link.sh" check || exit 1
