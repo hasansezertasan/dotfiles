@@ -61,7 +61,12 @@ elif [[ -e "${OMZ_DIR}" || -L "${OMZ_DIR}" ]]; then
   echo "Cannot install Oh My Zsh: ${OMZ_DIR} already exists" >&2
   exit 1
 else
-  git clone https://github.com/ohmyzsh/ohmyzsh.git "${OMZ_DIR}" || exit 1
+  # The clone is sourced by every interactive shell, so deny group and other
+  # write access regardless of the caller's umask
+  (
+    umask g-w,o-w
+    git clone https://github.com/ohmyzsh/ohmyzsh.git "${OMZ_DIR}"
+  ) || exit 1
 fi
 
 "${DOTFILES_DIR}/link.sh" install || exit 1
