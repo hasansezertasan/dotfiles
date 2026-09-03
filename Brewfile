@@ -1,15 +1,30 @@
 # Dependencies installed by bootstrap.sh. Homebrew itself, Git, and Zsh remain
 # external prerequisites.
 
-# Symlink manager used by link.sh
-brew "stow"
-
-# Commands driven by the macOS preferences in bootstrap.sh
+brew "atuin"
+brew "btop"
 brew "dockutil"
 brew "duti"
-
-# Commands initialized by the Oh My Zsh plugins in
-# zsh/.config/zsh/conf.d/10-oh-my-zsh.zsh
+brew "fzf"
+brew "gh"
+brew "jq"
+brew "meta-package-manager"
 brew "mise"
+brew "mole"
+brew "ripgrep"
+brew "skills"
 brew "starship"
+brew "stow"
+brew "tailscale"
+brew "tmux"
+brew "x-cmd"
+brew "yazi"
 brew "zoxide"
+
+tap "hasansezertasan/tap"
+brew "hasansezertasan/tap/cobo"
+brew "hasansezertasan/tap/hwid"
+brew "hasansezertasan/tap/nur"
+brew "hasansezertasan/tap/ocom"
+brew "hasansezertasan/tap/olink"
+brew "hasansezertasan/tap/peta"
