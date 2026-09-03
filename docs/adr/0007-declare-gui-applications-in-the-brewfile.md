@@ -52,3 +52,7 @@ installs the menu bar application, so they coexist rather than conflict.
   takes considerably longer.
 * Bad, because a cask that is renamed or removed upstream breaks
   `brew bundle install` until the `Brewfile` is corrected.
+
+## Related Research
+
+* [GUI application inventory and Brewfile cask selection](../research/0005-installed-cask-inventory.md)
