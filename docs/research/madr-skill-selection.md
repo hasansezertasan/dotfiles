@@ -35,3 +35,8 @@ artifact type visible in the path.
 
 Install and use `wshobson/agents@architecture-decision-records`. Record project
 decisions as sequential MADR documents under `docs/adr/`.
+
+The Skills CLI calls its project dependency file `skills-lock.json`. A
+project-scoped install records the upstream source, skill path, and computed
+content hash there, while `npx skills experimental_install` restores the local
+skill files. The generated `.agents/skills/` tree does not need to be versioned.

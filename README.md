@@ -43,3 +43,12 @@ available to every Zsh process, including non-interactive shells.
 
 `bootstrap.sh` applies macOS preferences. It is executable configuration, not a
 dotfile, and is therefore not part of any Stow package.
+
+## Agent skills
+
+Project skills are declared in `skills-lock.json`. Restore their generated,
+gitignored files with:
+
+```sh
+npx skills experimental_install
+```
