@@ -18,6 +18,15 @@ jobs:
       # without editing this workflow.
       - run: git ls-files -z '*.sh' | xargs -0 shellcheck
 
+  link:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends stow
+      # link_test.sh runs the real link.sh against a scratch HOME, so it never
+      # touches the runner's home directory.
+      - run: ./link_test.sh
+
   zsh-syntax:
     runs-on: ubuntu-latest
     steps:

@@ -14,7 +14,7 @@ taps the repository does not declare.
 
 `bootstrap.sh` makes Zed the default handler for twenty-one file types:
 
-```
+```console
 $ grep -nE 'brew bundle|duti -s' bootstrap.sh
 48:brew bundle install --file "${DOTFILES_DIR}/Brewfile" --no-upgrade || exit 1
 462:  duti -s dev.zed.Zed "${file_type}" all || EXIT_STATUS=1
@@ -28,7 +28,7 @@ sufficient and no reordering is needed.
 
 ## Scale of the gap
 
-```
+```console
 $ brew list --cask | wc -l
 62
 $ grep -c '^cask' Brewfile
@@ -39,7 +39,7 @@ $ grep -c '^cask' Brewfile
 taps are absent from the `Brewfile`, which declares only
 `hasansezertasan/tap`:
 
-```
+```text
 tap "hasansezertasan/tap"
 tap "omnigent-ai/tap"
 tap "stablyai/orca"
@@ -64,7 +64,7 @@ should not be used to regenerate the list.
 By default `brew bundle check` reports outdated packages as unsatisfied, which
 conflates "missing" with "not the newest":
 
-```
+```console
 $ brew bundle check --file Brewfile --verbose
 → Cask chatgpt needs to be installed or updated.
 → Cask claude needs to be installed or updated.
@@ -77,7 +77,7 @@ All four are installed. `bootstrap.sh` passes `--no-upgrade` to
 `brew bundle install`, so the matching check is the one that reflects what the
 bootstrap will actually do, and under it every declared cask is satisfied:
 
-```
+```console
 $ brew bundle check --file Brewfile --no-upgrade --verbose
 → Formula shellcheck needs to be installed.
 → Formula hasansezertasan/tap/{hwid,nur,ocom,peta} needs to be installed.
@@ -104,7 +104,7 @@ so it was checked. Neither Homebrew manifest declares a conflict, and the two
 install to different places: the formula owns the executable under the Homebrew
 prefix, and the cask is a `.pkg` that installs the menu bar application.
 
-```
+```console
 $ ls -l "$(command -v tailscale)"
 /opt/homebrew/bin/tailscale -> ../Cellar/tailscale/1.102.3/bin/tailscale
 
