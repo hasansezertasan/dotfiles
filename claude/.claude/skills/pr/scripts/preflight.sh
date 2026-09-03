@@ -3,9 +3,9 @@
 # Usage: preflight.sh
 set -uo pipefail
 
-CANON='^(feature|bugfix|hotfix|release|chore)/[a-z0-9]+(-[a-z0-9]+)*$'
+CONVENTIONAL_BRANCH_RE='^(feature|bugfix|hotfix|release|chore)/[a-z0-9]+(-[a-z0-9]+)*$'
 # Segments carrying no information about the change: always wrong.
-DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|final|new|branch'
+DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|final|new|branch|test'
 # Agent and tool names: wrong as authorship, fine as subject matter
 # (feature/add-claude-global-config is about Claude, not authored-by-Claude),
 # so these are surfaced for judgement rather than failed outright.
@@ -13,68 +13,126 @@ TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|gpt|llm|orca'
 
 say() { printf '%s\n' "$*"; }
 kv()  { printf '%-18s %s\n' "$1" "$2"; }
+normalize() {
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g; s/^-//; s/-$//'
+}
+resolve_remote_branch_sha() {
+  git ls-remote --exit-code --heads origin "$1" 2>/dev/null \
+    | awk 'NR == 1 { print $1 }'
+}
 
 git rev-parse --git-dir >/dev/null 2>&1 || { say "NOT A GIT REPO"; exit 1; }
 
 branch=$(git branch --show-current)
 [ -n "$branch" ] || { say "DETACHED HEAD - resolve before opening a PR"; exit 1; }
 
-# Default branch: origin/HEAD, else main, else master.
+# Prefer the local remote HEAD, but ask origin when it has not been recorded yet.
 default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')
 if [ -z "$default" ]; then
-  for c in main master; do
-    git show-ref --verify --quiet "refs/heads/$c" && { default=$c; break; }
-  done
+  remote_head=$(git ls-remote --symref origin HEAD 2>/dev/null)
+  remote_head_status=$?
+  if [ "$remote_head_status" -eq 0 ]; then
+    default=$(printf '%s\n' "$remote_head" | awk '$1 == "ref:" && $3 == "HEAD" { sub("refs/heads/", "", $2); print $2; exit }')
+  fi
+  if [ "$remote_head_status" -ne 0 ] || [ -z "$default" ]; then
+    say "DEFAULT BRANCH UNKNOWN - could not resolve origin/HEAD"
+    exit 1
+  fi
 fi
-default=${default:-main}
 
 say "=== BRANCH ==="
 kv "current" "$branch"
 kv "default" "$default"
 
-on_origin=no
-if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then on_origin=yes; fi
+remote_branch=$(resolve_remote_branch_sha "$branch")
+remote_status=$?
+case "$remote_status" in
+  0)
+    on_origin=yes
+    remote_branch_sha="$remote_branch"
+    ;;
+  2)
+    on_origin=no
+    remote_branch_sha=""
+    ;;
+  *)
+    kv "on origin" "UNKNOWN - remote lookup failed"
+    exit 1
+    ;;
+esac
 kv "on origin" "$on_origin"
 
-if [ "$branch" = "$default" ]; then
-  kv "verdict" "ON DEFAULT BRANCH - a new branch must be created"
-elif printf '%s' "$branch" | grep -Eq "$CANON"; then
-  kv "verdict" "CONFORMS"
-else
-  kv "verdict" "NON-CONFORMING - needs a conventional name"
-fi
-
 # Which segments look like a person or tool rather than the change?
-gituser=$(git config user.name 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr -d ' ')
-gitmail=$(git config user.email 2>/dev/null | cut -d@ -f1 | tr '[:upper:]' '[:lower:]')
+normalized_branch=$(normalize "$branch")
+gituser=$(normalize "$(git config user.name 2>/dev/null)")
+gitmail=$(normalize "$(git config user.email 2>/dev/null | cut -d@ -f1)")
 bad=""; advise=""
-IFS='/-' read -r -a segs <<< "$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]')"
+for identity in "$gituser" "$gitmail"; do
+  [ -n "$identity" ] || continue
+  case "-$normalized_branch-" in
+    *-"$identity"-*)
+      case " $bad " in *" $identity(username) "*) ;; *) bad="$bad $identity(username)" ;; esac
+      ;;
+  esac
+done
+IFS='-' read -r -a segs <<< "$normalized_branch"
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue
   case " $bad $advise " in *" $seg("*) continue ;; esac
-  if { [ -n "$gituser" ] && [ "$seg" = "$gituser" ]; } || { [ -n "$gitmail" ] && [ "$seg" = "$gitmail" ]; }; then
-    bad="$bad $seg(username)"
-  elif printf '%s' "$seg" | grep -Eq "^($DEAD_WORDS)$"; then
+  if printf '%s' "$seg" | grep -Eq "^($DEAD_WORDS)$"; then
     bad="$bad $seg(no-information)"
   elif printf '%s' "$seg" | grep -Eq "^($TOOL_WORDS)$"; then
     advise="$advise $seg"
   fi
 done
+branch_description=${normalized_branch#*-}
+if printf '%s' "$branch_description" | grep -Eq '^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'; then
+  bad="$bad $branch_description(bare-date)"
+fi
 [ -n "$bad" ] && kv "banned segments" "$bad"
 [ -n "$advise" ] && kv "judge these" "$advise - authorship (rename) or subject matter (keep)?"
 
+if [ "$branch" = "$default" ]; then
+  kv "verdict" "ON DEFAULT BRANCH - a new branch must be created"
+elif ! printf '%s' "$branch" | grep -Eq "$CONVENTIONAL_BRANCH_RE" || [ -n "$bad" ]; then
+  kv "verdict" "NON-CONFORMING - needs a conventional name"
+else
+  kv "verdict" "CONFORMS"
+fi
+
 say ""
 say "=== UNPUSHED COMMITS ==="
-range="$default..HEAD"
-if [ "$on_origin" = yes ]; then range="origin/$branch..HEAD"; fi
-count=$(git rev-list --count "$range" 2>/dev/null || echo 0)
+if [ "$on_origin" = yes ]; then
+  base="$remote_branch_sha"
+  base_label="origin/$branch"
+else
+  remote_default=$(resolve_remote_branch_sha "$default")
+  remote_default_status=$?
+  if [ "$remote_default_status" -ne 0 ]; then
+    say "UNPUSHED RANGE UNKNOWN - could not resolve origin/$default"
+    exit 1
+  fi
+  base="$remote_default"
+  base_label="origin/$default"
+fi
+if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+  say "UNPUSHED RANGE UNKNOWN - fetch $base_label before continuing"
+  exit 1
+fi
+range="$base..HEAD"
+if ! count=$(git rev-list --count "$range" 2>/dev/null); then
+  say "UNPUSHED RANGE UNKNOWN - could not resolve $range"
+  exit 1
+fi
 kv "range" "$range"
 kv "count" "$count"
 if [ "$count" != 0 ]; then
-  CC='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+  CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
   while IFS= read -r line; do
     sha=${line%% *}; subj=${line#* }
-    if printf '%s' "$subj" | grep -Eq "$CC"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
+    if printf '%s' "$subj" | grep -Eq "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
     printf '  %s  %-16s %s\n' "$sha" "$mark" "$subj"
   done < <(git log --reverse --format='%h %s' "$range")
 fi
@@ -82,7 +140,7 @@ fi
 say ""
 say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
 if [ "$count" != 0 ] && git log --format='%B' "$range" \
-     | grep -Eni '^[[:space:]]*co-authored-by:.*(claude|anthropic)|generated with \[?claude|🤖' ; then
+     | grep -Eni "^[[:space:]]*co-authored-by:.*($TOOL_WORDS)|generated[[:space:]]+(with|by).*($TOOL_WORDS)|🤖" ; then
   say "  ^ must be stripped before pushing"
 else
   say "  none"
@@ -91,8 +149,13 @@ fi
 say ""
 say "=== EXISTING PR ==="
 if command -v gh >/dev/null 2>&1; then
-  pr=$(gh pr view "$branch" --json number,state,title,url 2>/dev/null)
-  if [ -n "$pr" ]; then say "  $pr"; else say "  none open for $branch"; fi
+  if pr=$(gh pr list --head "$branch" --state open --limit 1 \
+      --json number,state,title,url --jq '.[0] // empty' 2>/dev/null); then
+    if [ -n "$pr" ]; then say "  $pr"; else say "  none open for $branch"; fi
+  else
+    say "  UNKNOWN - PR lookup failed"
+    exit 1
+  fi
 else
   say "  gh not installed"
 fi
