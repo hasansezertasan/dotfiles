@@ -1,5 +1,5 @@
-# Load tracked interactive-shell configuration in lexical order.
-ZSH_CONFIG_DIR="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh/conf.d"
+# Load interactive-shell configuration fragments in lexical order.
+ZSH_CONFIG_DIR="${HOME}/.config/zsh/conf.d"
 
 for config in "${ZSH_CONFIG_DIR}/"*.zsh(N); do
   source "${config}"

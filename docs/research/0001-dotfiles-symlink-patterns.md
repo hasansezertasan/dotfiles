@@ -66,7 +66,7 @@ The symlink target should be a small orchestrator, while substantial configurati
 
 ```zsh
 # ~/.zshrc -> ~/.dotfiles/zsh/.zshrc
-config_dir="${XDG_CONFIG_HOME:-${HOME}/.config}/zsh/conf.d"
+config_dir="${HOME}/.config/zsh/conf.d"
 
 for config in "${config_dir}/"*.zsh(N); do
   source "${config}"

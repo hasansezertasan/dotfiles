@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-readonly DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+readonly DOTFILES_DIR
 readonly TARGET_DIR="${HOME:?HOME must be set}"
 readonly -a PACKAGES=(claude zsh)
 
