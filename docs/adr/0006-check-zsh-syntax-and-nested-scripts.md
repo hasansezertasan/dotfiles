@@ -32,8 +32,8 @@ exits successfully and checks only the first file. This was verified against a
 deliberately broken fragment before the workflow was written, and `xargs -n1`
 is what keeps the check honest.
 
-The Zsh job installs `zsh` with `apt-get` rather than assuming the runner image
-provides it.
+The Zsh job installs `zsh` with `apt-get`. The `ubuntu-24.04` runner image does
+not ship it, so the step is required rather than defensive.
 
 ### Consequences
 
@@ -48,3 +48,7 @@ provides it.
 * Bad, because the Zsh job pays an `apt-get` install on every run.
 * Bad, because `xargs -n1` is load-bearing in a way that is easy to
   "simplify" back into a silently passing check.
+
+## Related Research
+
+* [Syntax checking the Stow-managed Zsh configuration](../research/0004-zsh-syntax-checking.md)
