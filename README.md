@@ -67,6 +67,18 @@ After installing shell dependencies and links, `bootstrap.sh` applies macOS
 preferences. It is executable configuration, not a dotfile, and is therefore
 not part of any Stow package.
 
+## Checks
+
+`bootstrap.sh` and `link.sh` are checked with ShellCheck:
+
+```sh
+shellcheck ./*.sh
+```
+
+The `CI` workflow runs the same command on every push to `main` and on every
+pull request. Zsh files under `zsh/` are not covered; ShellCheck does not
+support the Zsh dialect.
+
 ## Agent skills
 
 Project skills are declared in `skills-lock.json`. Restore their generated,
