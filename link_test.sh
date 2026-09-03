@@ -11,6 +11,9 @@ readonly DOTFILES_DIR
 # Paths the packages are expected to place in the target directory.
 readonly -a EXPECTED_LINKS=(
   .claude/CLAUDE.md
+  .config/atuin/config.toml
+  .config/gh/config.yml
+  .config/mise/config.toml
   .config/zsh/conf.d/00-path.zsh
   .config/zsh/conf.d/10-oh-my-zsh.zsh
   .gitconfig
@@ -22,6 +25,9 @@ readonly -a EXPECTED_LINKS=(
 readonly -a EXPECTED_DIRS=(
   .claude
   .config
+  .config/atuin
+  .config/gh
+  .config/mise
   .config/zsh
   .config/zsh/conf.d
 )
