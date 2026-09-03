@@ -32,13 +32,18 @@ default handler for a list of file types, which needs the app present.
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `claude`, `git`, and `zsh`; it intentionally does not discover packages
-so that adding a directory to the repository cannot unexpectedly change `$HOME`.
+manages `atuin`, `claude`, `gh`, `git`, `mise`, and `zsh`; it intentionally does
+not discover packages so that adding a directory to the repository cannot
+unexpectedly change `$HOME`.
 
-`~/.config/gh`, `~/.config/zed`, `~/.config/atuin`, and `~/.config/mise` are
-candidates for future packages. They are unmanaged for now because each needs
-checking first: `gh/hosts.yml` holds an authentication token, and the rest are
-rewritten by their own applications rather than only by hand.
+`~/.config/zed` is still unmanaged. Zed rewrites its own `settings.json` when
+settings are changed in the interface, and whether it preserves a symlink has
+not been verified. Confirm it before adding the package: change any setting in
+Zed, then check the path is still a link.
+
+```sh
+ls -l ~/.config/zed/settings.json
+```
 
 Preview changes before installing:
 
@@ -74,6 +79,26 @@ once, then install:
 mv ~/.gitconfig ~/.gitconfig.backup
 ./link.sh install
 ```
+
+The same applies to any newly managed path. Stow abandons the whole invocation
+on a conflict, so nothing is linked until every conflicting target has been
+moved aside.
+
+### Command-line tools
+
+The `gh`, `mise`, and `atuin` packages link a single configuration file each:
+`~/.config/gh/config.yml`, `~/.config/mise/config.toml`, and
+`~/.config/atuin/config.toml`. All three tools write to their configuration
+through the symlink, so `gh config set`, `mise use -g`, and `atuin config set`
+keep working and their changes appear as repository changes.
+
+`~/.config/gh/hosts.yml` is deliberately excluded and gitignored. GitHub CLI
+keeps the token in the system keyring when one is available, but writes it into
+that file when one is not, so the path must never become tracked.
+
+Because Git records only `644` and `755`, linking a configuration file that was
+`600` makes it group- and world-readable. That is acceptable for these three,
+which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Zsh
 

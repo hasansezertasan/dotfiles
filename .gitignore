@@ -1,1 +1,4 @@
 .agents/skills/
+
+# gh stores the auth token here when no system keyring is available.
+gh/.config/gh/hosts.yml
