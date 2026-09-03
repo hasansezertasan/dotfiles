@@ -20,6 +20,9 @@ Run the bundled report and read it before touching anything:
 bash ~/.claude/skills/pr/scripts/preflight.sh
 ```
 
+For a validation-only request, run `preflight.sh --local` instead. It checks the branch
+name without requiring `origin` or GitHub CLI and skips every remote-dependent check.
+
 It answers the five things that drive every later decision: what branch you are on,
 whether it already exists on origin, whether its name conforms, whether the unpushed
 commits are conventional and attribution-free, and whether a PR is already open.

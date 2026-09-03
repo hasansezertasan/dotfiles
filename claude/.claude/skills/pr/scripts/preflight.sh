@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Pre-flight report for the `pr` skill. Read-only: inspects, never mutates.
-# Usage: preflight.sh
+# Usage: preflight.sh [--local]
 set -uo pipefail
 
 CONVENTIONAL_BRANCH_RE='^(feature|bugfix|hotfix|release|chore)/[a-z0-9]+(-[a-z0-9]+)*$'
@@ -30,12 +30,21 @@ resolve_remote_branch_sha() {
 
 git rev-parse --git-dir >/dev/null 2>&1 || { say "NOT A GIT REPO"; exit 1; }
 
+local_only=no
+case "${1:-}" in
+  --local) local_only=yes ;;
+  "") ;;
+  *) say "Usage: preflight.sh [--local]"; exit 2 ;;
+esac
+
 branch=$(git branch --show-current)
 [ -n "$branch" ] || { say "DETACHED HEAD - resolve before opening a PR"; exit 1; }
 
-# Prefer the local remote HEAD, but ask origin when it has not been recorded yet.
-default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')
-if [ -z "$default" ]; then
+# Query origin in full mode so a stale local origin/HEAD cannot select the wrong base.
+if [ "$local_only" = yes ]; then
+  default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')
+  default=${default:-unknown}
+else
   remote_head=$(git ls-remote --symref origin HEAD 2>/dev/null)
   remote_head_status=$?
   if [ "$remote_head_status" -eq 0 ]; then
@@ -51,23 +60,29 @@ say "=== BRANCH ==="
 kv "current" "$branch"
 kv "default" "$default"
 
-remote_branch=$(resolve_remote_branch_sha "$branch")
-remote_status=$?
-case "$remote_status" in
-  0)
-    on_origin=yes
-    remote_branch_sha="$remote_branch"
-    ;;
-  2)
-    on_origin=no
-    remote_branch_sha=""
-    ;;
-  *)
-    kv "on origin" "UNKNOWN - remote lookup failed"
-    exit 1
-    ;;
-esac
-kv "on origin" "$on_origin"
+if [ "$local_only" = yes ]; then
+  on_origin=unknown
+  remote_branch_sha=""
+  kv "on origin" "UNKNOWN - local-only mode"
+else
+  remote_branch=$(resolve_remote_branch_sha "$branch")
+  remote_status=$?
+  case "$remote_status" in
+    0)
+      on_origin=yes
+      remote_branch_sha="$remote_branch"
+      ;;
+    2)
+      on_origin=no
+      remote_branch_sha=""
+      ;;
+    *)
+      kv "on origin" "UNKNOWN - remote lookup failed"
+      exit 1
+      ;;
+  esac
+  kv "on origin" "$on_origin"
+fi
 
 # Which segments look like a person or tool rather than the change?
 normalized_branch=$(normalize "$branch")
@@ -107,73 +122,86 @@ else
   kv "verdict" "CONFORMS"
 fi
 
-say ""
-say "=== UNPUSHED COMMITS ==="
-if [ "$on_origin" = yes ]; then
-  base="$remote_branch_sha"
-  base_label="origin/$branch"
-else
-  remote_default=$(resolve_remote_branch_sha "$default")
-  remote_default_status=$?
-  if [ "$remote_default_status" -ne 0 ]; then
-    say "UNPUSHED RANGE UNKNOWN - could not resolve origin/$default"
-    exit 1
-  fi
-  base="$remote_default"
-  base_label="origin/$default"
-fi
-if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
-  say "UNPUSHED RANGE UNKNOWN - fetch $base_label before continuing"
-  exit 1
-fi
-range="$base..HEAD"
-if ! count=$(git rev-list --count "$range" 2>/dev/null); then
-  say "UNPUSHED RANGE UNKNOWN - could not resolve $range"
-  exit 1
-fi
-kv "range" "$range"
-kv "count" "$count"
-if [ "$on_origin" = yes ]; then
-  if ! remote_only=$(git rev-list --count "HEAD..$base" 2>/dev/null); then
-    say "REMOTE RANGE UNKNOWN - could not resolve HEAD..$base"
-    exit 1
-  fi
-  kv "remote-only" "$remote_only"
-  if [ "$remote_only" != 0 ]; then
-    say "REMOTE AHEAD - fetch and reconcile $base_label before continuing"
-    exit 1
-  fi
-fi
-if [ "$count" != 0 ]; then
-  CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
-  while IFS= read -r line; do
-    sha=${line%% *}; subj=${line#* }
-    if printf '%s' "$subj" | grep -Eq "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
-    printf '  %s  %-16s %s\n' "$sha" "$mark" "$subj"
-  done < <(git log --reverse --format='%h %s' "$range")
-fi
-
-say ""
-say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
-if [ "$count" != 0 ] && git log --format='%B' "$range" \
-     | grep -Eni "^[[:space:]]*co-authored-by:.*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
-  say "  ^ must be stripped before pushing"
-else
-  say "  none"
-fi
-
-say ""
-say "=== EXISTING PR ==="
-if command -v gh >/dev/null 2>&1; then
-  if pr=$(gh pr list --head "$branch" --state open --limit 1 \
-      --json number,state,title,url --jq '.[0] // empty' 2>/dev/null); then
-    if [ -n "$pr" ]; then say "  $pr"; else say "  none open for $branch"; fi
+if [ "$local_only" = no ]; then
+  say ""
+  say "=== UNPUSHED COMMITS ==="
+  if [ "$on_origin" = yes ]; then
+    base="$remote_branch_sha"
+    base_label="origin/$branch"
   else
-    say "  UNKNOWN - PR lookup failed"
+    remote_default=$(resolve_remote_branch_sha "$default")
+    remote_default_status=$?
+    if [ "$remote_default_status" -ne 0 ]; then
+      say "UNPUSHED RANGE UNKNOWN - could not resolve origin/$default"
+      exit 1
+    fi
+    base="$remote_default"
+    base_label="origin/$default"
+  fi
+  if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+    say "UNPUSHED RANGE UNKNOWN - fetch $base_label before continuing"
+    exit 1
+  fi
+  range="$base..HEAD"
+  if ! count=$(git rev-list --count "$range" 2>/dev/null); then
+    say "UNPUSHED RANGE UNKNOWN - could not resolve $range"
+    exit 1
+  fi
+  kv "range" "$range"
+  kv "count" "$count"
+  if [ "$on_origin" = yes ]; then
+    if ! remote_only=$(git rev-list --count "HEAD..$base" 2>/dev/null); then
+      say "REMOTE RANGE UNKNOWN - could not resolve HEAD..$base"
+      exit 1
+    fi
+    kv "remote-only" "$remote_only"
+    if [ "$remote_only" != 0 ]; then
+      say "REMOTE AHEAD - fetch and reconcile $base_label before continuing"
+      exit 1
+    fi
+  fi
+  if [ "$count" != 0 ]; then
+    CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+    while IFS= read -r line; do
+      sha=${line%% *}; subj=${line#* }
+      if printf '%s' "$subj" | grep -Eq "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
+      printf '  %s  %-16s %s\n' "$sha" "$mark" "$subj"
+    done < <(git log --reverse --format='%h %s' "$range")
+  fi
+
+  say ""
+  say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
+  if [ "$count" != 0 ] && git log --format='%B' "$range" \
+       | grep -Eni "^[[:space:]]*co-authored-by:.*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
+    say "  ^ must be stripped before pushing"
+  else
+    say "  none"
+  fi
+
+  say ""
+  say "=== EXISTING PR ==="
+  if command -v gh >/dev/null 2>&1; then
+    repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
+    if ! printf '%s' "$repo" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+      say "  UNKNOWN - current GitHub repository lookup failed"
+      exit 1
+    fi
+    if pr=$(gh pr list --head "$branch" --state open --limit 100 \
+        --json number,state,title,url,headRepository \
+        --jq "[.[] | select(.headRepository.nameWithOwner == \"$repo\")][0] // empty" 2>/dev/null); then
+      if [ -n "$pr" ]; then say "  $pr"; else say "  none open for $branch"; fi
+    else
+      say "  UNKNOWN - PR lookup failed"
+      exit 1
+    fi
+  else
+    say "  GH CLI REQUIRED - install and authenticate gh before opening a PR"
     exit 1
   fi
 else
-  say "  gh not installed"
+  say ""
+  say "=== REMOTE CHECKS ==="
+  say "  skipped in local-only mode"
 fi
 
 say ""
