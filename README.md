@@ -2,6 +2,33 @@
 
 Personal macOS configuration, managed with GNU Stow.
 
+## Setup
+
+With Homebrew and Git available, install the command-line dependencies used by
+the link script and configured Zsh plugins:
+
+```sh
+brew install stow starship zoxide mise
+```
+
+Install Oh My Zsh when it is not already present:
+
+```sh
+omz_dir="${ZSH:-${HOME}/.oh-my-zsh}"
+if [[ -r "${omz_dir}/oh-my-zsh.sh" ]]; then
+  echo "Oh My Zsh is already installed at ${omz_dir}"
+elif [[ -e "${omz_dir}" || -L "${omz_dir}" ]]; then
+  echo "Cannot install Oh My Zsh: ${omz_dir} already exists" >&2
+else
+  git clone https://github.com/ohmyzsh/ohmyzsh.git "${omz_dir}"
+fi
+unset omz_dir
+```
+
+Cloning the framework directly avoids creating or replacing the `.zshrc`
+managed by this repository. An existing target is preserved and reported as a
+conflict unless it contains a readable `oh-my-zsh.sh` installation.
+
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
