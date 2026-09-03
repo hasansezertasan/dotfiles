@@ -19,8 +19,13 @@ normalize() {
     | sed -E 's/[^a-z0-9]+/-/g; s/^-//; s/-$//'
 }
 resolve_remote_branch_sha() {
-  git ls-remote --exit-code --heads origin "$1" 2>/dev/null \
-    | awk 'NR == 1 { print $1 }'
+  local remote_ref output status
+  remote_ref="refs/heads/$1"
+  output=$(git ls-remote --exit-code --heads origin "$remote_ref" 2>/dev/null)
+  status=$?
+  [ "$status" -eq 0 ] || return "$status"
+  printf '%s\n' "$output" \
+    | awk -v expected="$remote_ref" '$2 == expected { print $1; found = 1; exit } END { if (!found) exit 2 }'
 }
 
 git rev-parse --git-dir >/dev/null 2>&1 || { say "NOT A GIT REPO"; exit 1; }
@@ -128,6 +133,17 @@ if ! count=$(git rev-list --count "$range" 2>/dev/null); then
 fi
 kv "range" "$range"
 kv "count" "$count"
+if [ "$on_origin" = yes ]; then
+  if ! remote_only=$(git rev-list --count "HEAD..$base" 2>/dev/null); then
+    say "REMOTE RANGE UNKNOWN - could not resolve HEAD..$base"
+    exit 1
+  fi
+  kv "remote-only" "$remote_only"
+  if [ "$remote_only" != 0 ]; then
+    say "REMOTE AHEAD - fetch and reconcile $base_label before continuing"
+    exit 1
+  fi
+fi
 if [ "$count" != 0 ]; then
   CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
   while IFS= read -r line; do
@@ -140,7 +156,7 @@ fi
 say ""
 say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
 if [ "$count" != 0 ] && git log --format='%B' "$range" \
-     | grep -Eni "^[[:space:]]*co-authored-by:.*($TOOL_WORDS)|generated[[:space:]]+(with|by).*($TOOL_WORDS)|🤖" ; then
+     | grep -Eni "^[[:space:]]*co-authored-by:.*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
   say "  ^ must be stripped before pushing"
 else
   say "  none"

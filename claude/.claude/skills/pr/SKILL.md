@@ -111,6 +111,10 @@ Fix what it flags, scaled to where the problem sits:
 
 ## 5. Hand off
 
+Only enter this step when the user asked to open or update a PR. If they asked only to
+validate or rename a branch, or to fix a commit message, report that result and stop;
+do not commit, push, or create a PR unless their request included that operation.
+
 With the branch named, the history clean, and the three names decided, invoke:
 
 ```
