@@ -5,7 +5,10 @@ readonly DOTFILES_DIR
 
 COMPUTER_NAME="hasansezertasan"
 LANGUAGES=(en tr)
+# Read only by the commented-out localization defaults below.
+# shellcheck disable=SC2034
 LOCALE="en_US@currency=USD"
+# shellcheck disable=SC2034
 MEASUREMENT_UNITS="Centimeters"
 SCREENSHOTS_FOLDER="${HOME}/Screenshots"
 
