@@ -22,6 +22,32 @@ brew "x-cmd"
 brew "yazi"
 brew "zoxide"
 
+# GUI applications. bootstrap.sh makes Zed the default handler for a list of
+# file types with duti, so Zed has to be installed here rather than by hand.
+cask "chatgpt"
+cask "claude"
+cask "cloudflare-warp"
+cask "dbeaver-community"
+cask "discord"
+cask "ghostty"
+cask "google-chrome"
+cask "google-drive"
+cask "iina"
+cask "notunes"
+cask "openvpn-connect"
+cask "orbstack"
+cask "raycast"
+cask "slack"
+cask "spotify"
+cask "stats"
+# The tailscale formula above provides the CLI and daemon; this is the menu bar
+# app. They install to different prefixes and coexist.
+cask "tailscale-app"
+cask "visual-studio-code"
+cask "whatsapp"
+cask "zed"
+cask "zen"
+
 tap "hasansezertasan/tap"
 brew "hasansezertasan/tap/cobo"
 brew "hasansezertasan/tap/hwid"
