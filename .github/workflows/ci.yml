@@ -13,6 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      # ShellCheck is preinstalled on GitHub-hosted runners. Zsh files under
-      # zsh/ are unsupported by ShellCheck and stay out of the glob.
-      - run: shellcheck ./*.sh
+      # ShellCheck is preinstalled on GitHub-hosted runners. The pathspec
+      # matches tracked scripts at any depth, so nested ones are covered
+      # without editing this workflow.
+      - run: git ls-files -z '*.sh' | xargs -0 shellcheck
+
+  zsh-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zsh
+      # ShellCheck does not support the Zsh dialect, so the Zsh package gets a
+      # parse-only check instead. `zsh -n` reads one script and treats any
+      # further arguments as positional parameters, so `-n1` is required: a
+      # single invocation with several files silently checks only the first.
+      - run: git ls-files -z 'zsh/.zshrc' 'zsh/*.zsh' | xargs -0 -n1 zsh -n
