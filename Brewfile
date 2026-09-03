@@ -48,7 +48,10 @@ cask "whatsapp"
 cask "zed"
 cask "zen"
 
-tap "hasansezertasan/tap"
+# Homebrew refuses to load formulae from a third-party tap unless the tap is
+# trusted, and `brew bundle install` cannot prompt. Declaring the trust here
+# keeps the bootstrap non-interactive.
+tap "hasansezertasan/tap", trusted: { formulae: ["cobo", "hwid", "nur", "ocom", "olink", "peta"] }
 brew "hasansezertasan/tap/cobo"
 brew "hasansezertasan/tap/hwid"
 brew "hasansezertasan/tap/nur"
