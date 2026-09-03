@@ -25,7 +25,7 @@ for config in "${ZSH_CONFIG_DIR}/"*.zsh(N); do
 
 Forcing the Bash dialect on that file produces four errors and exit status 1:
 
-```
+```console
 $ shellcheck --shell=bash zsh/.zshrc; echo $?
 In zsh/.zshrc line 4:
 for config in "${ZSH_CONFIG_DIR}/"*.zsh(N); do
@@ -50,7 +50,7 @@ multi-file invocation reports only on the first file and exits successfully.
 Verified against a deliberately broken fragment containing a truncated
 `if true; then`:
 
-```
+```console
 $ zsh -n broken.zsh; echo $?
 broken.zsh:2: parse error near `\n'
 1
@@ -59,12 +59,24 @@ $ zsh -n zsh/.zshrc broken.zsh; echo $?
 0
 ```
 
-The second command is a check that can never fail. Any invocation that passes
-several files to one `zsh -n` process is therefore worse than no check at all,
-because it reports success. `xargs -n1` forces one file per process and
+Only the first file is parsed. The exit status reflects that file alone, so an
+error anywhere after it goes unreported: the invocation above exits 0 despite
+`broken.zsh` being unparseable. Reversing the order makes the same command
+fail, which confirms the check is real but covers exactly one file:
+
+```console
+$ zsh -n broken.zsh zsh/.zshrc; echo $?
+broken.zsh:2: parse error near `\n'
+1
+```
+
+A multi-file invocation is therefore not a check that always passes, but one
+whose coverage stops silently after the first argument. That is worse in
+practice than an obvious failure, because appending a file to it looks like
+widening the check and is not. `xargs -n1` forces one file per process and
 propagates a non-zero status if any single file fails:
 
-```
+```console
 $ printf 'zsh/.zshrc\0broken.zsh\0' | xargs -0 -n1 zsh -n; echo $?
 broken.zsh:2: parse error near `\n'
 1
@@ -76,7 +88,7 @@ The `ubuntu-24.04` runner image does not ship Zsh. The workflow's install step
 reports it as a new package rather than an existing one, so the step is
 required and not defensive:
 
-```
+```text
 0 upgraded, 2 newly installed, 0 to remove and 37 not upgraded.
 Setting up zsh-common (5.9-6ubuntu2) ...
 Setting up zsh (5.9-6ubuntu2) ...
@@ -90,7 +102,7 @@ shell glob would also have worked today but would pass an unexpanded pattern to
 `zsh -n` if the directory were ever empty. Git's `*` crosses directory
 separators, which is what lets `'zsh/*.zsh'` reach the nested fragments:
 
-```
+```console
 $ git ls-files 'zsh/.zshrc' 'zsh/*.zsh'
 zsh/.config/zsh/conf.d/00-path.zsh
 zsh/.config/zsh/conf.d/10-oh-my-zsh.zsh
