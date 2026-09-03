@@ -5,7 +5,7 @@ set -euo pipefail
 DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 readonly DOTFILES_DIR
 readonly TARGET_DIR="${HOME:?HOME must be set}"
-readonly -a PACKAGES=(atuin claude gh git mise zsh)
+readonly -a PACKAGES=(atuin claude codex gh git mise olink opencode ssh zed zsh)
 
 if ! command -v stow >/dev/null 2>&1; then
   echo "GNU Stow is required. Install it with: brew install stow" >&2

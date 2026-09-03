@@ -38,18 +38,9 @@ default handler for a list of file types, which needs the app present.
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `atuin`, `claude`, `gh`, `git`, `mise`, and `zsh`; it intentionally does
-not discover packages so that adding a directory to the repository cannot
-unexpectedly change `$HOME`.
-
-`~/.config/zed` is still unmanaged. Zed rewrites its own `settings.json` when
-settings are changed in the interface, and whether it preserves a symlink has
-not been verified. Confirm it before adding the package: change any setting in
-Zed, then check the path is still a link.
-
-```sh
-ls -l ~/.config/zed/settings.json
-```
+manages `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`, `opencode`,
+`ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
+adding a directory to the repository cannot unexpectedly change `$HOME`.
 
 Preview changes before installing:
 
@@ -105,6 +96,35 @@ that file when one is not, so the path must never become tracked.
 Because Git records only `644` and `755`, linking a configuration file that was
 `600` makes it group- and world-readable. That is acceptable for these three,
 which hold no credentials, and is a further reason to keep `hosts.yml` out.
+
+### Additional tool configuration
+
+The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
+`known_hosts`, sockets, and other machine-maintained SSH data must remain
+untracked. The repository ignore rules allow only the config file inside this
+package.
+
+The `olink` package manages `~/.config/olink/pins.json`.
+
+The `opencode` package manages the canonical global `opencode.jsonc` and the
+dependency manifest used by locally installed plugins. OpenCode automatically
+loads JavaScript files from `~/.config/opencode/plugins`, so the Open Island
+plugin, its installer marker, and `node_modules` remain application-managed.
+
+The `zed` package manages only `~/.config/zed/settings.json`. Zed's prompt
+database and other mutable state remain outside the repository. Zed's behaviour
+when saving settings through a symlink has not been verified; after changing a
+setting in the interface, confirm the path is still linked:
+
+```sh
+ls -l ~/.config/zed/settings.json
+```
+
+The `codex` package manages only `~/.codex/hooks.json`. The hook command uses
+`$HOME` instead of an absolute user path. `~/.codex/config.toml` remains local
+because Codex mixes durable preferences with generated project trust, hook
+hashes, desktop integration, and runtime paths in that file. Authentication,
+history, sessions, databases, caches, and other Codex state are also excluded.
 
 ### Zsh
 
