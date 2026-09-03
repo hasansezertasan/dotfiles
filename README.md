@@ -101,7 +101,19 @@ git ls-files -z '*.sh' | xargs -0 shellcheck
 git ls-files -z 'zsh/.zshrc' 'zsh/*.zsh' | xargs -0 -n1 zsh -n
 ```
 
-The `CI` workflow runs both commands on every push to `main` and on every pull
+`link.sh` has a behavioural test that runs it against a scratch `HOME`, so it
+never touches the real home directory:
+
+```sh
+./link_test.sh
+```
+
+It checks that `install` creates every expected link, that `--no-folding`
+leaves `~/.claude` and `~/.config` as real directories, that `uninstall`
+reverses cleanly, and that an existing file is refused rather than overwritten
+or adopted.
+
+The `CI` workflow runs all of these on every push to `main` and on every pull
 request. Each uses a pathspec rather than a fixed file list, so a new script or
 Zsh fragment is covered without editing the workflow.
 
