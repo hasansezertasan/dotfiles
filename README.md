@@ -26,6 +26,12 @@ brew bundle upgrade --file Brewfile
 
 The `Brewfile` declares casks as well as formulae. It is a curated list rather
 than a dump of everything installed, so an app has to be added deliberately.
+
+Formulae from the personal tap need that tap's trust declared in the same file.
+Homebrew will not load a formula from an untrusted third-party tap and
+`brew bundle` cannot prompt, so a bare `tap` line makes the bootstrap fail.
+Adding a formula to the tap means adding it to both the install list and the
+`trusted:` list.
 Zed is required rather than optional: the macOS settings below make it the
 default handler for a list of file types, which needs the app present.
 
