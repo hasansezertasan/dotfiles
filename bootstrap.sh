@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)" || exit 1
+readonly DOTFILES_DIR
+
 COMPUTER_NAME="hasansezertasan"
 LANGUAGES=(en tr)
 LOCALE="en_US@currency=USD"
@@ -8,6 +11,7 @@ SCREENSHOTS_FOLDER="${HOME}/Screenshots"
 
 # Topics
 #
+# - Shell dependencies & dotfile links
 # - Computer & Host name
 # - Localization
 # - System
@@ -22,17 +26,44 @@ SCREENSHOTS_FOLDER="${HOME}/Screenshots"
 # - Activity Monitor
 # - Software Updates
 
-# Third-party tools used below; fail before changing anything if they're absent
-REQUIRED_COMMANDS=(dockutil duti)
-MISSING_COMMANDS=()
-for cmd in "${REQUIRED_COMMANDS[@]}"; do
-  command -v "${cmd}" > /dev/null 2>&1 || MISSING_COMMANDS+=("${cmd}")
+# Homebrew is the external bootstrap prerequisite. Git and Zsh are normally
+# available on macOS, but check them before changing anything.
+BOOTSTRAP_PREREQUISITES=(brew git zsh)
+MISSING_PREREQUISITES=()
+for command_name in "${BOOTSTRAP_PREREQUISITES[@]}"; do
+  command -v "${command_name}" > /dev/null 2>&1 ||
+    MISSING_PREREQUISITES+=("${command_name}")
 done
-if [ ${#MISSING_COMMANDS[@]} -ne 0 ]; then
-  echo "Missing required command(s): ${MISSING_COMMANDS[*]}" >&2
-  echo "Install them first: brew install ${MISSING_COMMANDS[*]}" >&2
+if [ ${#MISSING_PREREQUISITES[@]} -ne 0 ]; then
+  echo "Missing bootstrap prerequisite(s): ${MISSING_PREREQUISITES[*]}" >&2
   exit 1
 fi
+
+# Install the commands declared in the Brewfile. `--no-upgrade` keeps the
+# bootstrap additive: already-installed formulae are left at their current
+# version instead of being upgraded as a side effect of running this script.
+brew bundle install --file "${DOTFILES_DIR}/Brewfile" --no-upgrade || exit 1
+
+# Detect link conflicts before installing any framework files.
+"${DOTFILES_DIR}/link.sh" check || exit 1
+
+OMZ_DIR="${ZSH:-${HOME:?HOME must be set}/.oh-my-zsh}"
+readonly OMZ_DIR
+if [[ -r "${OMZ_DIR}/oh-my-zsh.sh" ]]; then
+  echo "Oh My Zsh is already installed at ${OMZ_DIR}"
+elif [[ -e "${OMZ_DIR}" || -L "${OMZ_DIR}" ]]; then
+  echo "Cannot install Oh My Zsh: ${OMZ_DIR} already exists" >&2
+  exit 1
+else
+  # The clone is sourced by every interactive shell, so deny group and other
+  # write access regardless of the caller's umask
+  (
+    umask g-w,o-w
+    git clone https://github.com/ohmyzsh/ohmyzsh.git "${OMZ_DIR}"
+  ) || exit 1
+fi
+
+"${DOTFILES_DIR}/link.sh" install || exit 1
 
 # Set by the mutating commands below when they fail, and returned at exit so a
 # partial bootstrap is distinguishable from a clean one

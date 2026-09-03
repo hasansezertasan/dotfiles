@@ -2,6 +2,28 @@
 
 Personal macOS configuration, managed with GNU Stow.
 
+## Setup
+
+With Homebrew, Git, and Zsh available, run:
+
+```sh
+./bootstrap.sh
+```
+
+The bootstrap installs the `Brewfile` dependencies, checks for symlink
+conflicts, clones Oh My Zsh when needed, activates the managed links, and
+applies the macOS settings below. It preserves valid existing installations and
+refuses to overwrite conflicting paths.
+
+Homebrew packages are declared in the repository's `Brewfile` and installed with
+`brew bundle`. The bootstrap passes `--no-upgrade`, so already-installed
+formulae keep their current version. Inspect or upgrade them directly with:
+
+```sh
+brew bundle check --file Brewfile
+brew bundle upgrade --file Brewfile
+```
+
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
@@ -41,8 +63,9 @@ available to every Zsh process, including non-interactive shells.
 
 ## macOS settings
 
-`bootstrap.sh` applies macOS preferences. It is executable configuration, not a
-dotfile, and is therefore not part of any Stow package.
+After installing shell dependencies and links, `bootstrap.sh` applies macOS
+preferences. It is executable configuration, not a dotfile, and is therefore
+not part of any Stow package.
 
 ## Agent skills
 
