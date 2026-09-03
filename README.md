@@ -24,6 +24,11 @@ brew bundle check --file Brewfile
 brew bundle upgrade --file Brewfile
 ```
 
+The `Brewfile` declares casks as well as formulae. It is a curated list rather
+than a dump of everything installed, so an app has to be added deliberately.
+Zed is required rather than optional: the macOS settings below make it the
+default handler for a list of file types, which needs the app present.
+
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
