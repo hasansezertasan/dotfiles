@@ -24,6 +24,10 @@ ls -la ~/.config/ 2>/dev/null
 
 # macOS application support (for GUI apps in the Brewfile)
 ls ~/Library/Application\ Support/ 2>/dev/null
+
+# macOS preferences and sandboxed containers
+ls ~/Library/Preferences/ 2>/dev/null
+ls ~/Library/Containers/ 2>/dev/null
 ```
 
 Also check for tools listed in the `Brewfile` that might have config:
@@ -60,8 +64,10 @@ grep -rlci -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/
 ## Step 3 — Filter out already-managed tools
 
 Read the `PACKAGES` array from `link.sh` and remove those tools from the
-candidate list. Also skip tools that a previous research doc already
-investigated and rejected (check `docs/research/`).
+candidate list. Also check `docs/research/` for tools that were previously
+investigated — use prior findings as context, but re-evaluate rejected
+candidates if the tool may have been upgraded or its config layout changed
+since the last research snapshot.
 
 ## Step 4 — Assess symlink safety
 

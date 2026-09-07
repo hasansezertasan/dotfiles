@@ -70,6 +70,10 @@ cat "${SCRATCH}/repo/<config-file>"               # should have new value
 rm -rf "${SCRATCH}"
 ```
 
+If the package manages **multiple files**, repeat this test for each file the
+tool might write to. A file that is only read (not written by the tool) does not
+need the test — note it as read-only in the research doc.
+
 Each tool has its own env var for redirecting config. Some point to a
 **directory**, others to a **file** — adjust the template accordingly:
 
