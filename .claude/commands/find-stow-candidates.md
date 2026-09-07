@@ -49,7 +49,7 @@ For every config location found, classify each file:
 **Credential detection** — grep for patterns, never print actual values:
 
 ```bash
-grep -rlc -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/dev/null
+grep -rlci -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/dev/null
 ```
 
 **Generated state detection** — look for:
@@ -73,7 +73,7 @@ For each remaining candidate, determine:
 2. **Does the tool have a config-write command?** Something like
    `tool config set key value` that modifies the config file.
 
-3. **Can the symlink test be run?** The established method from ADR 0004:
+3. **Can the symlink test be run?** The established method from ADR 0009 (originally ADR 0004):
    create a scratch dir, symlink a config file into it, use the tool's own
    command to change a setting, verify the link survived.
 

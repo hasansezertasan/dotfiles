@@ -7,9 +7,9 @@ scripts, and document the decision.
 
 When adding multiple packages at once (e.g. "add ssh, olink, and zed"), run
 Steps 1-4 for all of them first (the research phase), then do Steps 5-7
-together (one link.sh update, one link_test.sh update, one test run), and
-write a single combined research doc and ADR covering all packages in the
-batch.
+together (one link.sh update, one link_test.sh update, one test run), update
+the README once for all packages (Step 8), and write a single combined
+research doc and ADR covering all packages in the batch.
 
 ## Before you start
 
@@ -70,11 +70,16 @@ cat "${SCRATCH}/repo/<config-file>"               # should have new value
 rm -rf "${SCRATCH}"
 ```
 
-Each tool has its own env var for redirecting config:
-- `GH_CONFIG_DIR` for gh
-- `MISE_GLOBAL_CONFIG_FILE` for mise
-- `ATUIN_CONFIG_DIR` for atuin
+Each tool has its own env var for redirecting config. Some point to a
+**directory**, others to a **file** — adjust the template accordingly:
+
+- `GH_CONFIG_DIR` for gh (directory)
+- `MISE_GLOBAL_CONFIG_FILE` for mise (file — point at the config file, not its parent)
+- `ATUIN_CONFIG_DIR` for atuin (directory)
 - Find the equivalent for the new tool in its docs
+
+For a **file-valued** redirect, set it to `"${SCRATCH}/cfg/<toolname>/<config-file>"`
+instead of the directory.
 
 If the tool has no config command or env var redirect, note this limitation.
 If the tool replaces the symlink, it cannot be managed — stop and report.
@@ -95,6 +100,17 @@ If any file contains absolute home paths like `/Users/hasansezertasan`, replace
 with `$HOME` where the tool supports variable expansion. If it doesn't, note
 this as a portability limitation.
 
+**Back up the originals.** The real `$HOME` still has the original config files.
+`link.sh` refuses to overwrite existing targets, so move each original aside
+before the install step:
+
+```bash
+mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>.bak
+```
+
+After `link.sh install` succeeds and the symlinks are verified, delete the
+backups. If something goes wrong, the `.bak` files restore the previous state.
+
 ## Step 4 — Write gitignore allowlists
 
 If the managed directory contains files that must NOT be tracked (credentials,
@@ -111,6 +127,14 @@ See existing patterns in `.gitignore` for `ssh/`, `codex/`, `zed/`, `opencode/`.
 
 Skip this step if the package directory contains only managed files with no
 sensitive siblings.
+
+After writing patterns, verify no managed file is accidentally ignored:
+
+```bash
+git check-ignore <toolname>/<path>/<managed-file>
+```
+
+If the command prints a path, the allowlist is too broad — fix the pattern.
 
 ## Step 5 — Update `link.sh`
 
@@ -148,7 +172,13 @@ If the test fails, fix the issue and re-run. Common problems:
 - Alphabetical order wrong (doesn't cause failure, but fix for consistency)
 - Gitignore pattern too broad (blocks the managed file)
 
-## Step 8 — Write the research doc
+## Step 8 — Update `README.md`
+
+Add the new package to the README's managed-package documentation. Follow the
+existing pattern: describe what the package links, what is deliberately
+excluded, and any symlink or permission caveats.
+
+## Step 9 — Write the research doc
 
 Create `docs/research/NNNN-<slug>.md` (next sequential number).
 
@@ -173,7 +203,7 @@ Research snapshot: <date> on macOS <version>.
 permission implications of 644 vs 600>
 ```
 
-## Step 9 — Write the ADR
+## Step 10 — Write the ADR
 
 Create `docs/adr/NNNN-<slug>.md` (next sequential number).
 
@@ -216,9 +246,12 @@ Before reporting done:
 - [ ] Config files inventoried and classified
 - [ ] Symlink write-through verified (or limitation documented)
 - [ ] Package directory created with only portable config
-- [ ] Gitignore allowlist added (if needed)
+- [ ] Original config backed up and removed from `$HOME`
+- [ ] Gitignore allowlist added (if needed) and `git check-ignore` passes
 - [ ] `link.sh` PACKAGES updated (alphabetical)
 - [ ] `link_test.sh` EXPECTED_LINKS and EXPECTED_DIRS updated (alphabetical)
 - [ ] `./link_test.sh` passes
+- [ ] `README.md` package documentation updated
 - [ ] Research doc written
 - [ ] ADR written
+- [ ] All changes committed
