@@ -9,7 +9,7 @@ DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|fi
 # Agent and tool names: wrong as authorship, fine as subject matter
 # (feature/add-claude-global-config is about Claude, not authored-by-Claude),
 # so these are surfaced for judgement rather than failed outright.
-TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|gpt|llm'
+TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|chatgpt|openai|gpt|llm'
 
 say() { printf '%s\n' "$*"; }
 kv()  { printf '%-18s %s\n' "$1" "$2"; }
@@ -157,7 +157,11 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
   if ! git merge-base --is-ancestor "$base" HEAD 2>/dev/null \
      && ! git merge-base --is-ancestor HEAD "$base" 2>/dev/null \
      && ! git merge-base "$base" HEAD >/dev/null 2>&1; then
-    say "UNRELATED HISTORIES - HEAD and $base_label share no ancestor"
+    if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = true ]; then
+      say "SHALLOW CLONE - deepen or unshallow before opening a PR"
+    else
+      say "UNRELATED HISTORIES - HEAD and $base_label share no ancestor"
+    fi
     exit 1
   fi
   range="$base..HEAD"
@@ -189,8 +193,17 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
 
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
-  if [ "$count" != 0 ] && git log --format='%B' "$range" \
-       | grep -Eni "^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
+  ATTR_RE="^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|🤖"
+  attr_found=no
+  if [ "$count" != 0 ]; then
+    while IFS= read -r sha; do
+      if git log -1 --format='%B' "$sha" | grep -Eqi "$ATTR_RE"; then
+        printf '  %s  ATTRIBUTION\n' "$sha"
+        attr_found=yes
+      fi
+    done < <(git log --reverse --format='%h' "$range")
+  fi
+  if [ "$attr_found" = yes ]; then
     say "  ^ must be stripped before pushing"
   else
     say "  none"
