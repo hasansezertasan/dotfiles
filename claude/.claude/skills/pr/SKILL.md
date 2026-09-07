@@ -23,6 +23,10 @@ bash ~/.claude/skills/pr/scripts/preflight.sh
 For a validation-only request, run `preflight.sh --local` instead. It checks the branch
 name without requiring `origin` or GitHub CLI and skips every remote-dependent check.
 
+If the user asks whether a **proposed** name is acceptable (not the current branch),
+validate it directly against the Conventional Branch pattern rather than running
+preflight, which always checks the checked-out branch.
+
 It answers the five things that drive every later decision: what branch you are on,
 whether it already exists on origin, whether its name conforms, whether the unpushed
 commits are conventional and attribution-free, and whether a PR is already open.
@@ -97,6 +101,9 @@ this PR does from the branch name alone?**
   `/commit-commands:commit-push-pr` create it.
 - **Already conforming** — leave it alone.
 
+After any rename, re-run `preflight.sh` — the old report's `on origin` and existing-PR
+results describe the previous name and are stale.
+
 ## 4. Leave the history clean
 
 The pre-flight lists every unpushed commit and flags any that are non-conventional or
@@ -126,7 +133,8 @@ With the branch named, the history clean, and the three names decided, invoke:
 
 It expects to run as tool calls in a single message with no commentary, which is exactly
 what a fully-decided situation allows. Use the names from step 2 verbatim — the commit
-subject, the branch, and the PR title were chosen together and should stay identical.
+subject and PR title are identical; the branch carries the same semantic choice in its
+own rendering (different type vocabulary, kebab-case, no scope or colon).
 
 If the pre-flight found a PR **already open** for this branch, do not create another
 PR. Keep the command's commit and push operations, omit only `gh pr create`. If the

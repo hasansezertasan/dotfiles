@@ -193,7 +193,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
 
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
-  ATTR_RE="^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|🤖"
+  ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|🤖"
   attr_found=no
   if [ "$count" != 0 ]; then
     while IFS= read -r sha; do
