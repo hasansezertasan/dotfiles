@@ -9,10 +9,11 @@ DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|fi
 # Agent and tool names: wrong as authorship, fine as subject matter
 # (feature/add-claude-global-config is about Claude, not authored-by-Claude),
 # so these are surfaced for judgement rather than failed outright.
-TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|gpt|llm|orca'
+TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|gpt|llm'
 
 say() { printf '%s\n' "$*"; }
 kv()  { printf '%-18s %s\n' "$1" "$2"; }
+matches() { printf '%s' "$1" | grep -Eq "$2"; }
 normalize() {
   printf '%s' "$1" \
     | tr '[:upper:]' '[:lower:]' \
@@ -40,10 +41,11 @@ esac
 branch=$(git branch --show-current)
 [ -n "$branch" ] || { say "DETACHED HEAD - resolve before opening a PR"; exit 1; }
 
-# Query origin in full mode so a stale local origin/HEAD cannot select the wrong base.
 if [ "$local_only" = yes ]; then
   default=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')
   default=${default:-unknown}
+  on_origin=unknown
+  remote_branch_sha=""
 else
   remote_head=$(git ls-remote --symref origin HEAD 2>/dev/null)
   remote_head_status=$?
@@ -54,17 +56,6 @@ else
     say "DEFAULT BRANCH UNKNOWN - could not resolve origin/HEAD"
     exit 1
   fi
-fi
-
-say "=== BRANCH ==="
-kv "current" "$branch"
-kv "default" "$default"
-
-if [ "$local_only" = yes ]; then
-  on_origin=unknown
-  remote_branch_sha=""
-  kv "on origin" "UNKNOWN - local-only mode"
-else
   remote_branch=$(resolve_remote_branch_sha "$branch")
   remote_status=$?
   case "$remote_status" in
@@ -81,6 +72,14 @@ else
       exit 1
       ;;
   esac
+fi
+
+say "=== BRANCH ==="
+kv "current" "$branch"
+kv "default" "$default"
+if [ "$local_only" = yes ]; then
+  kv "on origin" "UNKNOWN - local-only mode"
+else
   kv "on origin" "$on_origin"
 fi
 
@@ -101,14 +100,14 @@ IFS='-' read -r -a segs <<< "$normalized_branch"
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue
   case " $bad $advise " in *" $seg("*) continue ;; esac
-  if printf '%s' "$seg" | grep -Eq "^($DEAD_WORDS)$"; then
+  if matches "$seg" "^($DEAD_WORDS)$"; then
     bad="$bad $seg(no-information)"
-  elif printf '%s' "$seg" | grep -Eq "^($TOOL_WORDS)$"; then
+  elif matches "$seg" "^($TOOL_WORDS)$"; then
     advise="$advise $seg"
   fi
 done
 branch_description=${normalized_branch#*-}
-if printf '%s' "$branch_description" | grep -Eq '^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'; then
+if matches "$branch_description" '^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'; then
   bad="$bad $branch_description(bare-date)"
 fi
 [ -n "$bad" ] && kv "banned segments" "$bad"
@@ -116,7 +115,7 @@ fi
 
 if [ "$branch" = "$default" ]; then
   kv "verdict" "ON DEFAULT BRANCH - a new branch must be created"
-elif ! printf '%s' "$branch" | grep -Eq "$CONVENTIONAL_BRANCH_RE" || [ -n "$bad" ]; then
+elif ! matches "$branch" "$CONVENTIONAL_BRANCH_RE" || [ -n "$bad" ]; then
   kv "verdict" "NON-CONFORMING - needs a conventional name"
 else
   kv "verdict" "CONFORMS"
@@ -164,7 +163,7 @@ if [ "$local_only" = no ]; then
     CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
     while IFS= read -r line; do
       sha=${line%% *}; subj=${line#* }
-      if printf '%s' "$subj" | grep -Eq "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
+      if matches "$subj" "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
       printf '  %s  %-16s %s\n' "$sha" "$mark" "$subj"
     done < <(git log --reverse --format='%h %s' "$range")
   fi
@@ -182,7 +181,7 @@ if [ "$local_only" = no ]; then
   say "=== EXISTING PR ==="
   if command -v gh >/dev/null 2>&1; then
     repo=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
-    if ! printf '%s' "$repo" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+    if ! matches "$repo" '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
       say "  UNKNOWN - current GitHub repository lookup failed"
       exit 1
     fi
