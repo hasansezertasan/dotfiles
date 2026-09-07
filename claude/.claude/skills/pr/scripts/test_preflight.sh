@@ -61,10 +61,14 @@ refute "feature/add-test-coverage: test not sole desc"  is_sole_desc "feature/ad
 refute "chore/update-dependencies: update not sole"     is_sole_desc "chore/update-dependencies" "update"
 refute "feature/new-auth-flow: new not sole"            is_sole_desc "feature/new-auth-flow" "new"
 
-# --- noreply handle extraction ---
-extract_noreply() { local local_part=$1; case "$local_part" in *+*) normalize "${local_part#*+}" ;; *) return 1 ;; esac; }
-assert "noreply yields handle"     test "$(extract_noreply '13135006+hasansezertasan')" = "hasansezertasan"
-refute "plain email has no handle" extract_noreply "hasansezertasan"
+# --- noreply handle extraction (GitHub noreply only) ---
+extract_noreply() {
+  local email=$1 local_part=${1%%@*}
+  case "$email" in *+*@users.noreply.github.com) normalize "${local_part#*+}" ;; *) return 1 ;; esac
+}
+assert "github noreply yields handle"  test "$(extract_noreply '13135006+hasansezertasan@users.noreply.github.com')" = "hasansezertasan"
+refute "plain email has no handle"     extract_noreply "hasansezertasan@gmail.com"
+refute "non-github plus-addr skipped"  extract_noreply "john+work@gmail.com"
 
 # --- tool words ---
 assert "claude is tool"       matches "claude"    "^($TOOL_WORDS)$"
@@ -72,6 +76,15 @@ assert "ai is tool"           matches "ai"        "^($TOOL_WORDS)$"
 assert "copilot is tool"      matches "copilot"   "^($TOOL_WORDS)$"
 refute "react is not tool"    matches "react"     "^($TOOL_WORDS)$"
 refute "orca is not tool"     matches "orca"      "^($TOOL_WORDS)$"
+
+# --- commit subjects ---
+CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+[^.]$'
+assert "feat: add login"                matches "feat: add login"            "$CONVENTIONAL_COMMIT_RE"
+assert "fix(auth): handle null"         matches "fix(auth): handle null"     "$CONVENTIONAL_COMMIT_RE"
+assert "feat!: breaking change"         matches "feat!: breaking change"     "$CONVENTIONAL_COMMIT_RE"
+refute "trailing period rejected"       matches "feat: add login."           "$CONVENTIONAL_COMMIT_RE"
+refute "missing type rejected"          matches "add login"                  "$CONVENTIONAL_COMMIT_RE"
+refute "uppercase type rejected"        matches "Feat: add login"            "$CONVENTIONAL_COMMIT_RE"
 
 # --- bare dates ---
 BARE_DATE_RE='^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'

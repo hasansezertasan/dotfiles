@@ -32,6 +32,7 @@ resolve_remote_branch_sha() {
 git rev-parse --git-dir >/dev/null 2>&1 || { say "NOT A GIT REPO"; exit 1; }
 
 local_only=no
+[ "$#" -le 1 ] || { say "Usage: preflight.sh [--local]"; exit 2; }
 case "${1:-}" in
   --local) local_only=yes ;;
   "") ;;
@@ -86,10 +87,13 @@ fi
 # Which segments look like a person or tool rather than the change?
 normalized_branch=$(normalize "$branch")
 gituser=$(normalize "$(git config user.name 2>/dev/null)")
-raw_local=$(git config user.email 2>/dev/null | cut -d@ -f1)
+raw_email=$(git config user.email 2>/dev/null)
+raw_local=${raw_email%%@*}
 gitmail=$(normalize "$raw_local")
 gitnoreply=""
-case "$raw_local" in *+*) gitnoreply=$(normalize "${raw_local#*+}") ;; esac
+case "$raw_email" in
+  *+*@users.noreply.github.com) gitnoreply=$(normalize "${raw_local#*+}") ;;
+esac
 bad=""; advise=""
 for identity in "$gituser" "$gitmail" "$gitnoreply"; do
   [ -n "$identity" ] || continue
@@ -127,7 +131,10 @@ else
   kv "verdict" "CONFORMS"
 fi
 
-if [ "$local_only" = no ]; then
+has_head=yes
+git rev-parse --verify --quiet HEAD >/dev/null 2>&1 || has_head=no
+
+if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
   say ""
   say "=== UNPUSHED COMMITS ==="
   if [ "$on_origin" = yes ]; then
@@ -172,7 +179,7 @@ if [ "$local_only" = no ]; then
     fi
   fi
   if [ "$count" != 0 ]; then
-    CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+    CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+[^.]$'
     while IFS= read -r line; do
       sha=${line%% *}; subj=${line#* }
       if matches "$subj" "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
@@ -183,7 +190,7 @@ if [ "$local_only" = no ]; then
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
   if [ "$count" != 0 ] && git log --format='%B' "$range" \
-       | grep -Eni "^[[:space:]]*co-authored-by:.*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
+       | grep -Eni "^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
     say "  ^ must be stripped before pushing"
   else
     say "  none"
@@ -209,6 +216,10 @@ if [ "$local_only" = no ]; then
     say "  GH CLI REQUIRED - install and authenticate gh before opening a PR"
     exit 1
   fi
+elif [ "$has_head" = no ]; then
+  say ""
+  say "=== UNPUSHED COMMITS ==="
+  say "  skipped - no commits yet"
 else
   say ""
   say "=== REMOTE CHECKS ==="
@@ -219,7 +230,7 @@ say ""
 say "=== WORKING TREE ==="
 git status --short
 say ""
-if git rev-parse --verify --quiet HEAD >/dev/null 2>&1; then
+if [ "$has_head" = yes ]; then
   kv "tracked edits" "$(git diff HEAD --name-only | wc -l | tr -d ' ')"
   kv "untracked files" "$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
   git diff HEAD --stat | tail -1
