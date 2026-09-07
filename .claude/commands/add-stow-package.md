@@ -9,7 +9,8 @@ When adding multiple packages at once (e.g. "add ssh, olink, and zed"), run
 Steps 1-4 for all of them first (the research phase), then do Steps 5-8
 together (one link.sh update, one link_test.sh update, one test run, one
 install), update the README once for all packages (Step 9), and write a
-single combined research doc and ADR covering all packages in the batch.
+single combined research doc (Step 10) and ADR (Step 11) covering all
+packages in the batch.
 
 ## Before you start
 

@@ -53,7 +53,7 @@ For every config location found, classify each file:
 **Credential detection** — grep for patterns, never print actual values:
 
 ```bash
-grep -rlci -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/dev/null
+grep -rli -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/dev/null
 ```
 
 **Generated state detection** — look for:
