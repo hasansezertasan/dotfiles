@@ -77,14 +77,16 @@ assert "copilot is tool"      matches "copilot"   "^($TOOL_WORDS)$"
 refute "react is not tool"    matches "react"     "^($TOOL_WORDS)$"
 refute "orca is not tool"     matches "orca"      "^($TOOL_WORDS)$"
 
-# --- commit subjects ---
-CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+[^.]$'
-assert "feat: add login"                matches "feat: add login"            "$CONVENTIONAL_COMMIT_RE"
-assert "fix(auth): handle null"         matches "fix(auth): handle null"     "$CONVENTIONAL_COMMIT_RE"
-assert "feat!: breaking change"         matches "feat!: breaking change"     "$CONVENTIONAL_COMMIT_RE"
-refute "trailing period rejected"       matches "feat: add login."           "$CONVENTIONAL_COMMIT_RE"
-refute "missing type rejected"          matches "add login"                  "$CONVENTIONAL_COMMIT_RE"
-refute "uppercase type rejected"        matches "Feat: add login"            "$CONVENTIONAL_COMMIT_RE"
+# --- commit subjects (two-part check mirrors preflight.sh) ---
+CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
+commit_ok() { matches "$1" "$CONVENTIONAL_COMMIT_RE" && ! matches "$1" '\.$'; }
+assert "feat: add login"                commit_ok "feat: add login"
+assert "fix(auth): handle null"         commit_ok "fix(auth): handle null"
+assert "feat!: breaking change"         commit_ok "feat!: breaking change"
+assert "fix: x (single char desc)"      commit_ok "fix: x"
+refute "trailing period rejected"       commit_ok "feat: add login."
+refute "missing type rejected"          commit_ok "add login"
+refute "uppercase type rejected"        commit_ok "Feat: add login"
 
 # --- bare dates ---
 BARE_DATE_RE='^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'

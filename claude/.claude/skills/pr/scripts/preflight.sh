@@ -179,10 +179,10 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
     fi
   fi
   if [ "$count" != 0 ]; then
-    CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+[^.]$'
+    CONVENTIONAL_COMMIT_RE='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?: .+'
     while IFS= read -r line; do
       sha=${line%% *}; subj=${line#* }
-      if matches "$subj" "$CONVENTIONAL_COMMIT_RE"; then mark=ok; else mark="NON-CONVENTIONAL"; fi
+      if matches "$subj" "$CONVENTIONAL_COMMIT_RE" && ! matches "$subj" '\.$'; then mark=ok; else mark="NON-CONVENTIONAL"; fi
       printf '  %s  %-16s %s\n' "$sha" "$mark" "$subj"
     done < <(git log --reverse --format='%h %s' "$range")
   fi
@@ -190,7 +190,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
   if [ "$count" != 0 ] && git log --format='%B' "$range" \
-       | grep -Eni "^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by).*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
+       | grep -Eni "^[[:space:]]*co-authored-by:[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]]($TOOL_WORDS)([^[:alnum:]]|$)|🤖" ; then
     say "  ^ must be stripped before pushing"
   else
     say "  none"
