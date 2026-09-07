@@ -291,7 +291,7 @@ Chosen option: "<option>", because <reason>.
 Before reporting done:
 
 - [ ] Config files inventoried and classified
-- [ ] Symlink write-through verified (or limitation documented)
+- [ ] Symlink write-through verified for every writable file (read-only files exempt)
 - [ ] Package directory created with only portable config
 - [ ] Gitignore allowlist added (if needed, based on source inventory) and `git check-ignore` passes
 - [ ] `link.sh` PACKAGES updated (alphabetical)

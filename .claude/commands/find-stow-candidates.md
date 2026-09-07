@@ -89,7 +89,8 @@ Categorize each tool:
 |--------------|---------|
 | Verified safe | Tested — writes through symlink |
 | Likely safe | Has a config command but not yet tested |
-| Unknown | No config command or env var found |
+| Read-only / N/A | Config is never written by the tool — safe without a write-through test |
+| Unknown | No config command or env var found, and tool may write to config |
 | Unsafe | Known to replace symlinks |
 
 ## Step 5 — Determine package boundaries
