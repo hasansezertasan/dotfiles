@@ -60,13 +60,18 @@ mkdir -p "${SCRATCH}/repo" "${SCRATCH}/cfg/<toolname>"
 echo '<initial content>' > "${SCRATCH}/repo/<config-file>"
 ln -s "${SCRATCH}/repo/<config-file>" "${SCRATCH}/cfg/<toolname>/<config-file>"
 
-# Use the tool's own config command to change a setting
+# Use the tool's own config command to change a setting.
+# Pick a side-effect-free write command — one that only touches the config file
+# and does not install plugins, download tools, or modify caches. If the write
+# command has unavoidable side effects, redirect all affected state into
+# ${SCRATCH} or clean up explicitly after the test.
 <TOOL_CONFIG_ENV_VAR>="${SCRATCH}/cfg/<toolname>" <tool> <config-command> <setting> <value>
 
 # Check: link survived AND value landed in repo copy
 ls -l "${SCRATCH}/cfg/<toolname>/<config-file>"  # should be symlink
 cat "${SCRATCH}/repo/<config-file>"               # should have new value
 
+# Clean up scratch dir and any side effects (e.g. tool installations)
 rm -rf "${SCRATCH}"
 ```
 
@@ -103,8 +108,8 @@ The package mirrors the `$HOME` structure:
 Copy only the portable config files identified in Step 1.
 
 If any file contains absolute home paths like `/Users/hasansezertasan`, replace
-with `$HOME` where the tool supports variable expansion. If it doesn't, note
-this as a portability limitation.
+with `$HOME` where the tool supports variable expansion. If it doesn't, **exclude
+that file** — a committed absolute path is invalid on any other machine.
 
 The original config files still exist in `$HOME` at this point — they will be
 handled in the install step (Step 8) after the test passes.
@@ -208,7 +213,7 @@ written changes between Step 3 (copy) and now, especially if a GUI app was
 running:
 
 ```bash
-diff ~/.config/<toolname>/<config-file>.bak <toolname>/<relative-path>/<config-file>
+diff ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX} <toolname>/<relative-path>/<config-file>
 ```
 
 If they differ, reconcile (merge the newer changes into the package copy) before
