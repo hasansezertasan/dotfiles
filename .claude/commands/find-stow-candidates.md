@@ -81,16 +81,22 @@ For each remaining candidate, determine:
 
 3. **Can the symlink test be run?** The established method from ADR 0009 (originally ADR 0004):
    create a scratch dir, symlink a config file into it, use the tool's own
-   command to change a setting, verify the link survived.
+   command to change a setting, verify the link survived. Use a side-effect-free
+   write command and redirect all tool state (env vars, caches) into the scratch
+   dir — see `/add-stow-package` Step 2 for the full isolated template.
 
-Categorize each tool:
+Categorize each tool. For tools with **multiple writable files**, test each
+file individually — a tool can write through one symlink and replace another.
+Record per-file status in the research doc and only mark the tool as
+"Verified safe" when every writable file passes:
 
 | Safety status | Meaning |
 |--------------|---------|
-| Verified safe | Tested — writes through symlink |
+| Verified safe | Every writable file tested — all write through symlinks |
 | Likely safe | Has a config command but not yet tested |
 | Read-only / N/A | Config is never written by the tool — safe without a write-through test |
 | Unknown | No config command or env var found, and tool may write to config |
+| Partially safe | Some files write through, others don't — note which in the research doc |
 | Unsafe | Known to replace symlinks |
 
 ## Step 5 — Determine package boundaries

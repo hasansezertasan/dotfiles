@@ -30,6 +30,8 @@ Find every file the tool keeps under `$HOME`. Typical locations:
 - `~/.<toolname>` or `~/.<toolname>/`
 - `~/.config/<toolname>/`
 - `~/Library/Application Support/<toolname>/` (macOS apps)
+- `~/Library/Preferences/` (macOS plist-based preferences)
+- `~/Library/Containers/<toolname>/` (macOS sandboxed app containers)
 
 For each file, determine:
 
@@ -99,7 +101,7 @@ If the tool replaces the symlink, it cannot be managed — stop and report.
 
 The package mirrors the `$HOME` structure:
 
-```
+```text
 <toolname>/
 └── <relative-path-from-HOME>
     └── <config-file>
@@ -138,11 +140,11 @@ After writing patterns, verify both sides:
 
 ```bash
 # Managed files must NOT be ignored
-git check-ignore <toolname>/<path>/<managed-file>
+git check-ignore "<toolname>/<path>/<managed-file>"
 # ↑ If this prints a path, the allowlist is too broad — fix the pattern.
 
 # Excluded paths MUST be ignored
-git check-ignore <toolname>/<path>/<excluded-file>
+git check-ignore "<toolname>/<path>/<excluded-file>"
 # ↑ If this prints nothing, the deny rule is incomplete — fix the pattern.
 ```
 
@@ -191,7 +193,9 @@ suffix to avoid overwriting any pre-existing `.bak` from a previous attempt:
 
 ```bash
 BACKUP_SUFFIX=".bak.$(date +%s)"
-mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX}
+for f in <list of managed file paths relative to HOME>; do
+  mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"
+done
 ```
 
 Run the install and verify. If the install fails (e.g. a conflict from another
@@ -201,11 +205,15 @@ config:
 ```bash
 ./link.sh install
 if [ $? -ne 0 ]; then
-  mv ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX} ~/.config/<toolname>/<config-file>
+  for f in <list of managed file paths relative to HOME>; do
+    mv ~/"${f}${BACKUP_SUFFIX}" ~/"${f}"
+  done
   echo "Install failed — originals restored. Fix the conflict and retry."
   exit 1
 fi
-ls -l ~/.config/<toolname>/<config-file>  # should be a symlink into the repo
+for f in <list of managed file paths relative to HOME>; do
+  ls -l ~/"${f}"  # should be a symlink into the repo
+done
 ```
 
 Before deleting backups, diff each against the package copy — the tool may have
@@ -213,7 +221,9 @@ written changes between Step 3 (copy) and now, especially if a GUI app was
 running:
 
 ```bash
-diff ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX} <toolname>/<relative-path>/<config-file>
+for f in <list of managed file paths relative to HOME>; do
+  diff ~/"${f}${BACKUP_SUFFIX}" "<toolname>/${f}"
+done
 ```
 
 If they differ, reconcile (merge the newer changes into the package copy) before
