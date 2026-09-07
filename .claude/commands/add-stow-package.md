@@ -48,7 +48,7 @@ Classify carefully:
 
 ## Step 2 — Verify symlink write-through
 
-The tool must write *through* a symlink, not replace it (ADR 0004's criterion).
+The tool must write *through* a symlink, not replace it (ADR 0009's criterion, originally established in ADR 0004).
 
 The established test method:
 
