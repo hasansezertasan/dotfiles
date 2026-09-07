@@ -134,6 +134,7 @@ fi
 
 has_head=yes
 git rev-parse --verify --quiet HEAD >/dev/null 2>&1 || has_head=no
+deferred_exit=0
 
 if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
   say ""
@@ -227,6 +228,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
     fi
   else
     say "  UNKNOWN - gh CLI not installed (install and authenticate before opening a PR)"
+    deferred_exit=1
   fi
 elif [ "$has_head" = no ] && [ "$local_only" = no ]; then
   say ""
@@ -275,3 +277,5 @@ if [ "$attr_file_found" = yes ]; then
 else
   say "  none"
 fi
+
+exit "$deferred_exit"
