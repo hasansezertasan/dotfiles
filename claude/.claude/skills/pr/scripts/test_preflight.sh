@@ -42,12 +42,19 @@ refute "feat/add-login rejected"          matches "feat/add-login"          "$CO
 refute "feature/ rejected (empty desc)"   matches "feature/"                "$CONVENTIONAL_BRANCH_RE"
 refute "feature/add-login- rejected"      matches "feature/add-login-"      "$CONVENTIONAL_BRANCH_RE"
 
-# --- dead words ---
+# --- dead words (regex match) ---
 assert "wip is dead"          matches "wip"    "^($DEAD_WORDS)$"
 assert "tmp is dead"          matches "tmp"    "^($DEAD_WORDS)$"
 assert "misc is dead"         matches "misc"   "^($DEAD_WORDS)$"
 refute "login is not dead"    matches "login"  "^($DEAD_WORDS)$"
 refute "widget is not dead"   matches "widget" "^($DEAD_WORDS)$"
+
+# --- dead words only flag when they ARE the entire description ---
+is_sole_desc() { local branch=$1 seg=$2; local desc=${branch#*/}; [ "$desc" = "$seg" ]; }
+assert "chore/wip: wip is sole desc"                   is_sole_desc "chore/wip" "wip"
+refute "feature/add-test-coverage: test not sole desc"  is_sole_desc "feature/add-test-coverage" "test"
+refute "chore/update-dependencies: update not sole"     is_sole_desc "chore/update-dependencies" "update"
+refute "feature/new-auth-flow: new not sole"            is_sole_desc "feature/new-auth-flow" "new"
 
 # --- tool words ---
 assert "claude is tool"       matches "claude"    "^($TOOL_WORDS)$"

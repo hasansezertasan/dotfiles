@@ -96,11 +96,15 @@ for identity in "$gituser" "$gitmail"; do
       ;;
   esac
 done
+description_part=${normalized_branch#*/}
 IFS='-' read -r -a segs <<< "$normalized_branch"
+seg_count=${#segs[@]}
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue
   case " $bad $advise " in *" $seg("*) continue ;; esac
-  if matches "$seg" "^($DEAD_WORDS)$"; then
+  # Dead words are only vague when they ARE the entire description;
+  # in a compound like add-test-coverage, "test" is informative.
+  if matches "$seg" "^($DEAD_WORDS)$" && [ "$description_part" = "$seg" ]; then
     bad="$bad $seg(no-information)"
   elif matches "$seg" "^($TOOL_WORDS)$"; then
     advise="$advise $seg"
@@ -139,6 +143,12 @@ if [ "$local_only" = no ]; then
   fi
   if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
     say "UNPUSHED RANGE UNKNOWN - fetch $base_label before continuing"
+    exit 1
+  fi
+  if ! git merge-base --is-ancestor "$base" HEAD 2>/dev/null \
+     && ! git merge-base --is-ancestor HEAD "$base" 2>/dev/null \
+     && ! git merge-base "$base" HEAD >/dev/null 2>&1; then
+    say "UNRELATED HISTORIES - HEAD and $base_label share no ancestor"
     exit 1
   fi
   range="$base..HEAD"
@@ -207,6 +217,11 @@ say ""
 say "=== WORKING TREE ==="
 git status --short
 say ""
-kv "tracked edits" "$(git diff HEAD --name-only | wc -l | tr -d ' ')"
-kv "untracked files" "$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
-git diff HEAD --stat | tail -1
+if git rev-parse --verify --quiet HEAD >/dev/null 2>&1; then
+  kv "tracked edits" "$(git diff HEAD --name-only | wc -l | tr -d ' ')"
+  kv "untracked files" "$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
+  git diff HEAD --stat | tail -1
+else
+  kv "tracked edits" "n/a (no commits yet)"
+  kv "untracked files" "$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
+fi
