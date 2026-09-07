@@ -6,10 +6,10 @@ verify symlink safety, create the packages, wire them into the link and test
 scripts, and document the decision.
 
 When adding multiple packages at once (e.g. "add ssh, olink, and zed"), run
-Steps 1-4 for all of them first (the research phase), then do Steps 5-7
-together (one link.sh update, one link_test.sh update, one test run), update
-the README once for all packages (Step 8), and write a single combined
-research doc and ADR covering all packages in the batch.
+Steps 1-4 for all of them first (the research phase), then do Steps 5-8
+together (one link.sh update, one link_test.sh update, one test run, one
+install), update the README once for all packages (Step 9), and write a
+single combined research doc and ADR covering all packages in the batch.
 
 ## Before you start
 
@@ -100,21 +100,16 @@ If any file contains absolute home paths like `/Users/hasansezertasan`, replace
 with `$HOME` where the tool supports variable expansion. If it doesn't, note
 this as a portability limitation.
 
-**Back up the originals.** The real `$HOME` still has the original config files.
-`link.sh` refuses to overwrite existing targets, so move each original aside
-before the install step:
-
-```bash
-mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>.bak
-```
-
-After `link.sh install` succeeds and the symlinks are verified, delete the
-backups. If something goes wrong, the `.bak` files restore the previous state.
+The original config files still exist in `$HOME` at this point — they will be
+handled in the install step (Step 8) after the test passes.
 
 ## Step 4 — Write gitignore allowlists
 
-If the managed directory contains files that must NOT be tracked (credentials,
-generated state), add an allowlist block to the repo root `.gitignore`:
+If the **source directory in `$HOME`** (from Step 1) contains files that must
+NOT be tracked (credentials, generated state) beside the portable config, add
+an allowlist block to the repo root `.gitignore`. Base this decision on the
+source inventory, not the package directory — the package only has portable
+files, but the tool may regenerate sensitive siblings through the symlink:
 
 ```gitignore
 # <Toolname> keeps <description of sensitive/generated files> beside <managed file>.
@@ -125,8 +120,8 @@ generated state), add an allowlist block to the repo root `.gitignore`:
 Pattern: deny everything in the directory, then allow back only the managed files.
 See existing patterns in `.gitignore` for `ssh/`, `codex/`, `zed/`, `opencode/`.
 
-Skip this step if the package directory contains only managed files with no
-sensitive siblings.
+Skip this step if the source directory in `$HOME` contains only the managed
+files with no sensitive siblings.
 
 After writing patterns, verify no managed file is accidentally ignored:
 
@@ -172,13 +167,33 @@ If the test fails, fix the issue and re-run. Common problems:
 - Alphabetical order wrong (doesn't cause failure, but fix for consistency)
 - Gitignore pattern too broad (blocks the managed file)
 
-## Step 8 — Update `README.md`
+## Step 8 — Install on the real `$HOME`
+
+The test (Step 7) validates the package in isolation. Now install it for real.
+
+Back up the originals so `link.sh` can create the symlinks:
+
+```bash
+mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>.bak
+```
+
+Run the install and verify:
+
+```bash
+./link.sh install
+ls -l ~/.config/<toolname>/<config-file>  # should be a symlink into the repo
+```
+
+Once verified, delete the backups. If something goes wrong, the `.bak` files
+restore the previous state.
+
+## Step 9 — Update `README.md`
 
 Add the new package to the README's managed-package documentation. Follow the
 existing pattern: describe what the package links, what is deliberately
 excluded, and any symlink or permission caveats.
 
-## Step 9 — Write the research doc
+## Step 10 — Write the research doc
 
 Create `docs/research/NNNN-<slug>.md` (next sequential number).
 
@@ -203,7 +218,7 @@ Research snapshot: <date> on macOS <version>.
 permission implications of 644 vs 600>
 ```
 
-## Step 10 — Write the ADR
+## Step 11 — Write the ADR
 
 Create `docs/adr/NNNN-<slug>.md` (next sequential number).
 
@@ -246,11 +261,11 @@ Before reporting done:
 - [ ] Config files inventoried and classified
 - [ ] Symlink write-through verified (or limitation documented)
 - [ ] Package directory created with only portable config
-- [ ] Original config backed up and removed from `$HOME`
-- [ ] Gitignore allowlist added (if needed) and `git check-ignore` passes
+- [ ] Gitignore allowlist added (if needed, based on source inventory) and `git check-ignore` passes
 - [ ] `link.sh` PACKAGES updated (alphabetical)
 - [ ] `link_test.sh` EXPECTED_LINKS and EXPECTED_DIRS updated (alphabetical)
 - [ ] `./link_test.sh` passes
+- [ ] Original config backed up, `./link.sh install` run, symlinks verified
 - [ ] `README.md` package documentation updated
 - [ ] Research doc written
 - [ ] ADR written
