@@ -98,7 +98,6 @@ for identity in "$gituser" "$gitmail"; do
 done
 description_part=${normalized_branch#*/}
 IFS='-' read -r -a segs <<< "$normalized_branch"
-seg_count=${#segs[@]}
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue
   case " $bad $advise " in *" $seg("*) continue ;; esac
