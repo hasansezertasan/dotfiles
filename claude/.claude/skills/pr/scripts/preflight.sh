@@ -94,23 +94,23 @@ gitnoreply=""
 case "$raw_email" in
   *+*@users.noreply.github.com) gitnoreply=$(normalize "${raw_local#*+}") ;;
 esac
+normalized_desc=$(normalize "${branch#*/}")
 bad=""; advise=""
 for identity in "$gituser" "$gitmail" "$gitnoreply"; do
   [ -n "$identity" ] || continue
-  case "-$normalized_branch-" in
+  case "-$normalized_desc-" in
     *-"$identity"-*)
       case " $bad " in *" $identity(username) "*) ;; *) bad="$bad $identity(username)" ;; esac
       ;;
   esac
 done
-description_part=$(normalize "${branch#*/}")
 IFS='-' read -r -a segs <<< "$normalized_branch"
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue
   case " $bad $advise " in *" $seg("*) continue ;; esac
   # Dead words are only vague when they ARE the entire description;
   # in a compound like add-test-coverage, "test" is informative.
-  if matches "$seg" "^($DEAD_WORDS)$" && [ "$description_part" = "$seg" ]; then
+  if matches "$seg" "^($DEAD_WORDS)$" && [ "$normalized_desc" = "$seg" ]; then
     bad="$bad $seg(no-information)"
   elif matches "$seg" "^($TOOL_WORDS)$"; then
     advise="$advise $seg"
@@ -193,7 +193,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
 
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
-  ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|🤖"
+  ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|^[[:space:]]*🤖"
   attr_found=no
   if [ "$count" != 0 ]; then
     while IFS= read -r sha; do

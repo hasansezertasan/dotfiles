@@ -24,8 +24,10 @@ For a validation-only request, run `preflight.sh --local` instead. It checks the
 name without requiring `origin` or GitHub CLI and skips every remote-dependent check.
 
 If the user asks whether a **proposed** name is acceptable (not the current branch),
-validate it directly against the Conventional Branch pattern rather than running
-preflight, which always checks the checked-out branch.
+validate it yourself rather than running preflight (which always checks the checked-out
+branch). Apply the same checks preflight does: the Conventional Branch regex, plus the
+semantic rules — no dead-word-only descriptions (`feature/wip`), no bare dates, no
+username segments, and tool-name segments flagged for judgement.
 
 It answers the five things that drive every later decision: what branch you are on,
 whether it already exists on origin, whether its name conforms, whether the unpushed
