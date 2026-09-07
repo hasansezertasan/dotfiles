@@ -53,7 +53,9 @@ For every config location found, classify each file:
 **Credential detection** — grep for patterns, never print actual values:
 
 ```bash
-grep -rli -E '(token|api_key|secret|password|oauth|credential|auth)' <path> 2>/dev/null
+grep -rli -E '(token|api[_-]?key|secret|password|oauth|credential|auth|private[_ -]?key)' "<path>" 2>/dev/null
+# Also check for PEM/SSH key files by name
+find "<path>" -name '*.pem' -o -name '*.key' -o -name 'id_*' 2>/dev/null
 ```
 
 **Generated state detection** — look for:

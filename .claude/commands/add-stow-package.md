@@ -199,14 +199,22 @@ for f in <list of managed file paths relative to HOME>; do
 done
 ```
 
+If a GUI app or daemon might recreate config files after the backup move,
+stop the owning process first (e.g. quit the app) before running `link.sh`.
+
 Run the install and verify. If the install fails (e.g. a conflict from another
-package), restore every backup immediately — do not leave the tool without its
-config:
+package or a recreated file), check whether a new file appeared at the target
+path before restoring — if so, reconcile it with the backup rather than
+blindly overwriting:
 
 ```bash
 ./link.sh install
 if [ $? -ne 0 ]; then
   for f in <list of managed file paths relative to HOME>; do
+    if [ -e ~/"${f}" ] && [ ! -L ~/"${f}" ]; then
+      # Tool recreated this file — save it before restoring backup
+      mv ~/"${f}" ~/"${f}.recreated"
+    fi
     mv ~/"${f}${BACKUP_SUFFIX}" ~/"${f}"
   done
   echo "Install failed — originals restored. Fix the conflict and retry."
@@ -229,6 +237,13 @@ done
 
 If they differ, reconcile (merge the newer changes into the package copy) before
 removing the backup. If identical, delete safely.
+
+**Re-check classification after reconciliation.** If the diff introduced new
+content, re-run the credential/classification checks from Step 1 on the
+reconciled file before staging. A file that was portable at copy time can
+become unsafe if the tool wrote credentials, generated state, or absolute
+machine paths in the interim. Do not commit until the reconciled content
+passes the same classification criteria.
 
 ## Step 9 — Update `README.md`
 
