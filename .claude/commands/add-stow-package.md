@@ -127,13 +127,17 @@ See existing patterns in `.gitignore` for `ssh/`, `codex/`, `zed/`, `opencode/`.
 Skip this step if the source directory in `$HOME` contains only the managed
 files with no sensitive siblings.
 
-After writing patterns, verify no managed file is accidentally ignored:
+After writing patterns, verify both sides:
 
 ```bash
+# Managed files must NOT be ignored
 git check-ignore <toolname>/<path>/<managed-file>
-```
+# ↑ If this prints a path, the allowlist is too broad — fix the pattern.
 
-If the command prints a path, the allowlist is too broad — fix the pattern.
+# Excluded paths MUST be ignored
+git check-ignore <toolname>/<path>/<excluded-file>
+# ↑ If this prints nothing, the deny rule is incomplete — fix the pattern.
+```
 
 ## Step 5 — Update `link.sh`
 
@@ -188,8 +192,16 @@ Run the install and verify:
 ls -l ~/.config/<toolname>/<config-file>  # should be a symlink into the repo
 ```
 
-Once verified, delete the backups. If something goes wrong, the `.bak` files
-restore the previous state.
+Before deleting backups, diff each against the package copy — the tool may have
+written changes between Step 3 (copy) and now, especially if a GUI app was
+running:
+
+```bash
+diff ~/.config/<toolname>/<config-file>.bak <toolname>/<relative-path>/<config-file>
+```
+
+If they differ, reconcile (merge the newer changes into the package copy) before
+removing the backup. If identical, delete safely.
 
 ## Step 9 — Update `README.md`
 

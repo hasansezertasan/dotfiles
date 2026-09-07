@@ -152,6 +152,10 @@ End the research doc with a clear action list:
 
 Then tell the user which candidates are ready for `/add-stow-package`.
 
+## Step 8 — Commit
+
+Commit the research document with the related work.
+
 ## Output
 
 Report to the user:
