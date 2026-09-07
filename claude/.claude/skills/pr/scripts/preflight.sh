@@ -216,6 +216,10 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
     say "  GH CLI REQUIRED - install and authenticate gh before opening a PR"
     exit 1
   fi
+elif [ "$has_head" = no ] && [ "$local_only" = no ]; then
+  say ""
+  say "NO COMMITS YET - commit before opening a PR"
+  exit 1
 elif [ "$has_head" = no ]; then
   say ""
   say "=== UNPUSHED COMMITS ==="
