@@ -86,9 +86,12 @@ fi
 # Which segments look like a person or tool rather than the change?
 normalized_branch=$(normalize "$branch")
 gituser=$(normalize "$(git config user.name 2>/dev/null)")
-gitmail=$(normalize "$(git config user.email 2>/dev/null | cut -d@ -f1)")
+raw_local=$(git config user.email 2>/dev/null | cut -d@ -f1)
+gitmail=$(normalize "$raw_local")
+gitnoreply=""
+case "$raw_local" in *+*) gitnoreply=$(normalize "${raw_local#*+}") ;; esac
 bad=""; advise=""
-for identity in "$gituser" "$gitmail"; do
+for identity in "$gituser" "$gitmail" "$gitnoreply"; do
   [ -n "$identity" ] || continue
   case "-$normalized_branch-" in
     *-"$identity"-*)
@@ -96,7 +99,7 @@ for identity in "$gituser" "$gitmail"; do
       ;;
   esac
 done
-description_part=${normalized_branch#*/}
+description_part=$(normalize "${branch#*/}")
 IFS='-' read -r -a segs <<< "$normalized_branch"
 for seg in "${segs[@]}"; do
   [ -n "$seg" ] || continue

@@ -50,11 +50,21 @@ refute "login is not dead"    matches "login"  "^($DEAD_WORDS)$"
 refute "widget is not dead"   matches "widget" "^($DEAD_WORDS)$"
 
 # --- dead words only flag when they ARE the entire description ---
-is_sole_desc() { local branch=$1 seg=$2; local desc=${branch#*/}; [ "$desc" = "$seg" ]; }
+normalize() {
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -E 's/[^a-z0-9]+/-/g; s/^-//; s/-$//'
+}
+is_sole_desc() { local branch=$1 seg=$2; local desc; desc=$(normalize "${branch#*/}"); [ "$desc" = "$seg" ]; }
 assert "chore/wip: wip is sole desc"                   is_sole_desc "chore/wip" "wip"
 refute "feature/add-test-coverage: test not sole desc"  is_sole_desc "feature/add-test-coverage" "test"
 refute "chore/update-dependencies: update not sole"     is_sole_desc "chore/update-dependencies" "update"
 refute "feature/new-auth-flow: new not sole"            is_sole_desc "feature/new-auth-flow" "new"
+
+# --- noreply handle extraction ---
+extract_noreply() { local local_part=$1; case "$local_part" in *+*) normalize "${local_part#*+}" ;; *) return 1 ;; esac; }
+assert "noreply yields handle"     test "$(extract_noreply '13135006+hasansezertasan')" = "hasansezertasan"
+refute "plain email has no handle" extract_noreply "hasansezertasan"
 
 # --- tool words ---
 assert "claude is tool"       matches "claude"    "^($TOOL_WORDS)$"
