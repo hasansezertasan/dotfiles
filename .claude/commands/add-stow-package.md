@@ -85,7 +85,9 @@ Each tool has its own env var for redirecting config. Some point to a
 For a **file-valued** redirect, set it to `"${SCRATCH}/cfg/<toolname>/<config-file>"`
 instead of the directory.
 
-If the tool has no config command or env var redirect, note this limitation.
+If the tool has no config command or env var redirect, only add files the tool
+**never writes to** (read-only config). If the tool writes to its config but
+write-through cannot be verified, do not add those files — stop and report.
 If the tool replaces the symlink, it cannot be managed — stop and report.
 
 ## Step 3 — Create the package directory
@@ -179,16 +181,25 @@ If the test fails, fix the issue and re-run. Common problems:
 
 The test (Step 7) validates the package in isolation. Now install it for real.
 
-Back up the originals so `link.sh` can create the symlinks:
+Back up the originals so `link.sh` can create the symlinks. Use a unique
+suffix to avoid overwriting any pre-existing `.bak` from a previous attempt:
 
 ```bash
-mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>.bak
+BACKUP_SUFFIX=".bak.$(date +%s)"
+mv ~/.config/<toolname>/<config-file> ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX}
 ```
 
-Run the install and verify:
+Run the install and verify. If the install fails (e.g. a conflict from another
+package), restore every backup immediately — do not leave the tool without its
+config:
 
 ```bash
 ./link.sh install
+if [ $? -ne 0 ]; then
+  mv ~/.config/<toolname>/<config-file>${BACKUP_SUFFIX} ~/.config/<toolname>/<config-file>
+  echo "Install failed — originals restored. Fix the conflict and retry."
+  exit 1
+fi
 ls -l ~/.config/<toolname>/<config-file>  # should be a symlink into the repo
 ```
 
