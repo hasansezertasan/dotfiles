@@ -25,7 +25,7 @@ refute() {
 
 CONVENTIONAL_BRANCH_RE='^(feature|bugfix|hotfix|release|chore)/[a-z0-9]+(-[a-z0-9]+)*$'
 DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|final|new|branch|test'
-TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|chatgpt|openai|gpt|llm'
+TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|chatgpt|openai|gemini|gpt|llm'
 
 matches() { printf '%s' "$1" | grep -Eq "$2"; }
 
@@ -76,6 +76,7 @@ assert "ai is tool"           matches "ai"        "^($TOOL_WORDS)$"
 assert "copilot is tool"      matches "copilot"   "^($TOOL_WORDS)$"
 assert "chatgpt is tool"     matches "chatgpt"   "^($TOOL_WORDS)$"
 assert "openai is tool"      matches "openai"    "^($TOOL_WORDS)$"
+assert "gemini is tool"      matches "gemini"    "^($TOOL_WORDS)$"
 refute "react is not tool"    matches "react"     "^($TOOL_WORDS)$"
 refute "orca is not tool"     matches "orca"      "^($TOOL_WORDS)$"
 
@@ -98,7 +99,7 @@ refute "add-login not a date"     matches "add-login"   "$BARE_DATE_RE"
 refute "2026 not a full date"     matches "2026"        "$BARE_DATE_RE"
 
 # --- attribution detection (tool name in name vs email domain) ---
-ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|^[[:space:]]*🤖"
+ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|^[[:space:]]*generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|^[[:space:]]*🤖"
 attr() { printf '%s' "$1" | grep -Eqi "$ATTR_RE"; }
 assert "co-authored claude bot"         attr "Co-authored-by: Claude Bot <noreply@anthropic.com>"
 assert "co-authored chatgpt"            attr "Co-authored-by: ChatGPT <chatgpt@openai.com>"

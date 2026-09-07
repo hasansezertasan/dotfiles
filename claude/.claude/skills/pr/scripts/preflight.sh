@@ -9,7 +9,8 @@ DEAD_WORDS='wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|fi
 # Agent and tool names: wrong as authorship, fine as subject matter
 # (feature/add-claude-global-config is about Claude, not authored-by-Claude),
 # so these are surfaced for judgement rather than failed outright.
-TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|chatgpt|openai|gpt|llm'
+TOOL_WORDS='claude|anthropic|ai|bot|agent|copilot|cursor|codex|chatgpt|openai|gemini|gpt|llm'
+ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|^[[:space:]]*generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|^[[:space:]]*🤖"
 
 say() { printf '%s\n' "$*"; }
 kv()  { printf '%-18s %s\n' "$1" "$2"; }
@@ -150,7 +151,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
     base="$remote_default"
     base_label="origin/$default"
   fi
-  if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null; then
+  if ! git rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1; then
     say "UNPUSHED RANGE UNKNOWN - fetch $base_label before continuing"
     exit 1
   fi
@@ -193,7 +194,6 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
 
   say ""
   say "=== AI ATTRIBUTION IN UNPUSHED COMMITS ==="
-  ATTR_RE="^[[:space:]]*co-authored-by[[:space:]]*:[[:space:]]*(($TOOL_WORDS)([^[:alnum:]]|$)|[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$))|generated[[:space:]]+(with|by)[^<]*[^[:alnum:]<]($TOOL_WORDS)([^[:alnum:]]|$)|^[[:space:]]*🤖"
   attr_found=no
   if [ "$count" != 0 ]; then
     while IFS= read -r sha; do
@@ -226,8 +226,7 @@ if [ "$local_only" = no ] && [ "$has_head" = yes ]; then
       exit 1
     fi
   else
-    say "  GH CLI REQUIRED - install and authenticate gh before opening a PR"
-    exit 1
+    say "  UNKNOWN - gh CLI not installed (install and authenticate before opening a PR)"
   fi
 elif [ "$has_head" = no ] && [ "$local_only" = no ]; then
   say ""
@@ -254,4 +253,25 @@ if [ "$has_head" = yes ]; then
 else
   kv "tracked edits" "n/a (no commits yet)"
   kv "untracked files" "$(git ls-files --others --exclude-standard | wc -l | tr -d ' ')"
+fi
+
+say ""
+say "=== AI ATTRIBUTION IN PENDING FILES ==="
+attr_file_found=no
+while IFS= read -r f; do
+  [ -f "$f" ] || continue
+  if grep -Eqi "$ATTR_RE" "$f" 2>/dev/null; then
+    printf '  %s  ATTRIBUTION\n' "$f"
+    attr_file_found=yes
+  fi
+done < <({
+  if [ "$has_head" = yes ]; then
+    git diff HEAD --name-only 2>/dev/null
+  fi
+  git ls-files --others --exclude-standard
+} | sort -u)
+if [ "$attr_file_found" = yes ]; then
+  say "  ^ check these files before committing"
+else
+  say "  none"
 fi

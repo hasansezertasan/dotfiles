@@ -104,7 +104,9 @@ this PR does from the branch name alone?**
 - **Already conforming** — leave it alone.
 
 After any rename, re-run `preflight.sh` — the old report's `on origin` and existing-PR
-results describe the previous name and are stale.
+results describe the previous name and are stale. If the re-run shows the new name
+already exists on origin, stop and ask — pushing would fast-forward or append to a
+branch that was not yours.
 
 ## 4. Leave the history clean
 
