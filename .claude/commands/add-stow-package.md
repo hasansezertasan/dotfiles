@@ -194,8 +194,17 @@ suffix to avoid overwriting any pre-existing `.bak` from a previous attempt:
 
 ```bash
 BACKUP_SUFFIX=".bak.$(date +%s)"
+BACKED_UP=()
 for f in <list of managed file paths relative to HOME>; do
-  mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"
+  if ! mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"; then
+    # Partial failure — restore files already moved
+    for b in "${BACKED_UP[@]}"; do
+      mv ~/"${b}${BACKUP_SUFFIX}" ~/"${b}"
+    done
+    echo "Backup failed for ${f} — all backups restored. Investigate and retry."
+    exit 1
+  fi
+  BACKED_UP+=("${f}")
 done
 ```
 
@@ -204,16 +213,15 @@ stop the owning process first (e.g. quit the app) before running `link.sh`.
 
 Run the install and verify. If the install fails (e.g. a conflict from another
 package or a recreated file), check whether a new file appeared at the target
-path before restoring — if so, reconcile it with the backup rather than
-blindly overwriting:
+path before restoring — if so, save it with a unique timestamped name rather
+than blindly overwriting:
 
 ```bash
 ./link.sh install
 if [ $? -ne 0 ]; then
-  for f in <list of managed file paths relative to HOME>; do
+  for f in "${BACKED_UP[@]}"; do
     if [ -e ~/"${f}" ] && [ ! -L ~/"${f}" ]; then
-      # Tool recreated this file — save it before restoring backup
-      mv ~/"${f}" ~/"${f}.recreated"
+      mv ~/"${f}" ~/"${f}.recreated.$(date +%s)"
     fi
     mv ~/"${f}${BACKUP_SUFFIX}" ~/"${f}"
   done

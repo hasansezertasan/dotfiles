@@ -20,7 +20,7 @@ Check these locations for user-authored configuration:
 ls -la ~/.[!.]* 2>/dev/null
 
 # XDG config directory
-ls -la ~/.config/ 2>/dev/null
+ls -la "${XDG_CONFIG_HOME:-$HOME/.config}/" 2>/dev/null
 
 # macOS application support (for GUI apps in the Brewfile)
 ls ~/Library/Application\ Support/ 2>/dev/null
