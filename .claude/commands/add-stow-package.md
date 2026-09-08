@@ -197,8 +197,11 @@ BACKUP_SUFFIX=".bak.$(date +%s)"
 BACKED_UP=()
 for f in <list of managed file paths relative to HOME>; do
   if ! mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"; then
-    # Partial failure — restore files already moved
+    # Partial failure — restore files already moved (preserve any recreated files)
     for b in "${BACKED_UP[@]}"; do
+      if [ -e ~/"${b}" ] && [ ! -L ~/"${b}" ]; then
+        mv ~/"${b}" ~/"${b}.recreated.$(date +%s)"
+      fi
       mv ~/"${b}${BACKUP_SUFFIX}" ~/"${b}"
     done
     echo "Backup failed for ${f} — all backups restored. Investigate and retry."
@@ -238,8 +241,12 @@ written changes between Step 3 (copy) and now, especially if a GUI app was
 running:
 
 ```bash
-for f in <list of managed file paths relative to HOME>; do
-  diff ~/"${f}${BACKUP_SUFFIX}" "<toolname>/${f}"
+# MANAGED_MAP: associative array mapping HOME-relative path → repo-relative path
+# e.g. ".config/tool/config.toml" → "tool/.config/tool/config.toml"
+# For batch workflows with multiple packages, populate one entry per managed file
+# across all packages.
+for f in "${!MANAGED_MAP[@]}"; do
+  diff ~/"${f}${BACKUP_SUFFIX}" "${MANAGED_MAP[$f]}"
 done
 ```
 
