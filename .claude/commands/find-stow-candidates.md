@@ -19,9 +19,10 @@ Check these locations for user-authored configuration:
 # Dotfiles and dot-directories directly under $HOME
 ls -la ~/.[!.]* 2>/dev/null
 
-# XDG config directory (only if inside $HOME — Stow can't manage paths outside it)
-XDG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
-case "${XDG_DIR}" in "$HOME"/*) ls -la "${XDG_DIR}/" 2>/dev/null ;; *) echo "Skipping ${XDG_DIR} — outside \$HOME" ;; esac
+# XDG config directory (only if physically inside $HOME — Stow can't manage paths outside it)
+XDG_DIR="$(cd "${XDG_CONFIG_HOME:-$HOME/.config}" 2>/dev/null && pwd -P || echo "${XDG_CONFIG_HOME:-$HOME/.config}")"
+REAL_HOME="$(cd "$HOME" && pwd -P)"
+case "${XDG_DIR}" in "${REAL_HOME}"/*) ls -la "${XDG_DIR}/" 2>/dev/null ;; *) echo "Skipping ${XDG_DIR} — outside \$HOME" ;; esac
 
 # macOS application support (for GUI apps in the Brewfile)
 ls ~/Library/Application\ Support/ 2>/dev/null

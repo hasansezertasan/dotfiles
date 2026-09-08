@@ -48,6 +48,7 @@ Classify carefully:
 - Files with absolute paths (e.g. `/Users/hasansezertasan/...`) → **machine-specific** unless the path can be replaced with `$HOME`
 - Files written by installers, plugins, or the tool itself without user input → **generated-state**
 - Lock files, `node_modules/`, `.db`, `.sqlite`, history files → **cache/database**
+- Files that **require mode `600`** for the tool to accept them (e.g. SSH private keys) → exclude unless `644` is acceptable. Git stores files as `644`; a `600`-required file checked in will break on fresh checkout. If the tool enforces `600` but the file has no credentials, note the incompatibility in the research doc
 
 ## Step 2 — Verify symlink write-through
 
@@ -219,7 +220,7 @@ cleanup() {
   echo "Interrupted — backups restored."
   exit 1
 }
-trap cleanup INT TERM
+trap cleanup INT TERM HUP
 for f in <list of managed file paths relative to HOME>; do
   IN_FLIGHT="${f}"
   if ! mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"; then
@@ -233,8 +234,8 @@ for f in <list of managed file paths relative to HOME>; do
     echo "Backup failed for ${f} — all backups restored. Investigate and retry."
     exit 1
   fi
-  IN_FLIGHT=""
   BACKED_UP+=("${f}")
+  IN_FLIGHT=""
 done
 ```
 
@@ -258,7 +259,7 @@ if [ $? -ne 0 ]; then
   echo "Install failed — originals restored. Fix the conflict and retry."
   exit 1
 fi
-trap - INT TERM  # install succeeded — remove the cleanup trap
+trap - INT TERM HUP  # install succeeded — remove the cleanup trap
 for f in <list of managed file paths relative to HOME>; do
   ls -l ~/"${f}"  # should be a symlink into the repo
 done
