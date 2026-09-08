@@ -98,6 +98,11 @@ If the tool has no config command or env var redirect, only add files the tool
 write-through cannot be verified, do not add those files — stop and report.
 If the tool replaces the symlink, it cannot be managed — stop and report.
 
+**On early stop:** still write the research doc (Step 10) and ADR (Step 11)
+documenting the investigation and the "not viable" decision, then commit.
+This preserves the findings for future attempts so the investigation is not
+repeated.
+
 ## Step 3 — Create the package directory
 
 The package mirrors the `$HOME` structure:
@@ -241,12 +246,12 @@ written changes between Step 3 (copy) and now, especially if a GUI app was
 running:
 
 ```bash
-# MANAGED_MAP: associative array mapping HOME-relative path → repo-relative path
-# e.g. ".config/tool/config.toml" → "tool/.config/tool/config.toml"
-# For batch workflows with multiple packages, populate one entry per managed file
-# across all packages.
-for f in "${!MANAGED_MAP[@]}"; do
-  diff ~/"${f}${BACKUP_SUFFIX}" "${MANAGED_MAP[$f]}"
+# Parallel arrays mapping HOME-relative path → repo-relative path.
+# Bash 3.2 compatible (no associative arrays).
+# e.g. HOME_PATHS=(".config/tool/config.toml") REPO_PATHS=("tool/.config/tool/config.toml")
+# For batch workflows with multiple packages, include entries from all packages.
+for i in "${!HOME_PATHS[@]}"; do
+  diff ~/"${HOME_PATHS[$i]}${BACKUP_SUFFIX}" "${REPO_PATHS[$i]}"
 done
 ```
 
