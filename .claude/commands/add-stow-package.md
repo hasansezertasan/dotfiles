@@ -213,6 +213,7 @@ cleanup() {
   [ -n "${IN_FLIGHT}" ] && [ -e ~/"${IN_FLIGHT}${BACKUP_SUFFIX}" ] && \
     mv ~/"${IN_FLIGHT}${BACKUP_SUFFIX}" ~/"${IN_FLIGHT}" 2>/dev/null
   for b in "${BACKED_UP[@]}"; do
+    [ "${b}" = "${IN_FLIGHT}" ] && continue  # already restored above
     [ -e ~/"${b}" ] && [ ! -L ~/"${b}" ] && \
       mv ~/"${b}" ~/"${b}.recreated.$(date +%s)" 2>/dev/null
     mv ~/"${b}${BACKUP_SUFFIX}" ~/"${b}" 2>/dev/null
