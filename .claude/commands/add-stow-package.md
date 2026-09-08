@@ -94,14 +94,21 @@ For a **file-valued** redirect, set it to `"${SCRATCH}/cfg/<toolname>/<config-fi
 instead of the directory.
 
 If the tool has no config command or env var redirect, only add files the tool
-**never writes to** (read-only config). If the tool writes to its config but
-write-through cannot be verified, do not add those files — stop and report.
-If the tool replaces the symlink, it cannot be managed — stop and report.
+**never writes to** (read-only config). For files the tool writes to:
 
-**On early stop:** still write the research doc (Step 10) and ADR (Step 11)
-documenting the investigation and the "not viable" decision, then commit.
-This preserves the findings for future attempts so the investigation is not
-repeated.
+- If write-through **cannot be verified**, exclude those specific files.
+- If the tool **replaces** a symlink, exclude that specific file.
+
+Only stop the tool entirely if **no** portable, symlink-safe files remain after
+per-file exclusion. When running a **batch**, a non-viable tool does not abort
+the batch — record it as non-viable, continue Steps 1-4 for the remaining
+tools, and include the non-viable tool's findings in the combined research doc
+and ADR (Steps 10-11).
+
+**On early stop (single tool) or non-viable result (batch):** still write the
+research doc (Step 10) and ADR (Step 11) documenting the investigation and the
+"not viable" decision, then commit. This preserves the findings for future
+attempts so the investigation is not repeated.
 
 ## Step 3 — Create the package directory
 
@@ -200,7 +207,21 @@ suffix to avoid overwriting any pre-existing `.bak` from a previous attempt:
 ```bash
 BACKUP_SUFFIX=".bak.$(date +%s)"
 BACKED_UP=()
+IN_FLIGHT=""
+cleanup() {
+  [ -n "${IN_FLIGHT}" ] && [ -e ~/"${IN_FLIGHT}${BACKUP_SUFFIX}" ] && \
+    mv ~/"${IN_FLIGHT}${BACKUP_SUFFIX}" ~/"${IN_FLIGHT}" 2>/dev/null
+  for b in "${BACKED_UP[@]}"; do
+    [ -e ~/"${b}" ] && [ ! -L ~/"${b}" ] && \
+      mv ~/"${b}" ~/"${b}.recreated.$(date +%s)" 2>/dev/null
+    mv ~/"${b}${BACKUP_SUFFIX}" ~/"${b}" 2>/dev/null
+  done
+  echo "Interrupted — backups restored."
+  exit 1
+}
+trap cleanup INT TERM
 for f in <list of managed file paths relative to HOME>; do
+  IN_FLIGHT="${f}"
   if ! mv ~/"${f}" ~/"${f}${BACKUP_SUFFIX}"; then
     # Partial failure — restore files already moved (preserve any recreated files)
     for b in "${BACKED_UP[@]}"; do
@@ -212,6 +233,7 @@ for f in <list of managed file paths relative to HOME>; do
     echo "Backup failed for ${f} — all backups restored. Investigate and retry."
     exit 1
   fi
+  IN_FLIGHT=""
   BACKED_UP+=("${f}")
 done
 ```
@@ -236,6 +258,7 @@ if [ $? -ne 0 ]; then
   echo "Install failed — originals restored. Fix the conflict and retry."
   exit 1
 fi
+trap - INT TERM  # install succeeded — remove the cleanup trap
 for f in <list of managed file paths relative to HOME>; do
   ls -l ~/"${f}"  # should be a symlink into the repo
 done
@@ -260,10 +283,12 @@ removing the backup. If identical, delete safely.
 
 **Re-check classification after reconciliation.** If the diff introduced new
 content, re-run the credential/classification checks from Step 1 on the
-reconciled file before staging. A file that was portable at copy time can
-become unsafe if the tool wrote credentials, generated state, or absolute
-machine paths in the interim. Do not commit until the reconciled content
-passes the same classification criteria.
+reconciled file before staging — both content patterns (`token`, `api[_-]?key`,
+`secret`, `password`, `oauth`, `credential`, `auth`, `private[_ -]?key`) and
+filename patterns (`*.pem`, `*.key`, `id_*`). A file that was portable at copy
+time can become unsafe if the tool wrote credentials, generated state, or
+absolute machine paths in the interim. Do not commit until the reconciled
+content passes the same classification criteria.
 
 ## Step 9 — Update `README.md`
 

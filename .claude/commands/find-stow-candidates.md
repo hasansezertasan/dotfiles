@@ -19,8 +19,9 @@ Check these locations for user-authored configuration:
 # Dotfiles and dot-directories directly under $HOME
 ls -la ~/.[!.]* 2>/dev/null
 
-# XDG config directory
-ls -la "${XDG_CONFIG_HOME:-$HOME/.config}/" 2>/dev/null
+# XDG config directory (only if inside $HOME — Stow can't manage paths outside it)
+XDG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
+case "${XDG_DIR}" in "$HOME"/*) ls -la "${XDG_DIR}/" 2>/dev/null ;; *) echo "Skipping ${XDG_DIR} — outside \$HOME" ;; esac
 
 # macOS application support (for GUI apps in the Brewfile)
 ls ~/Library/Application\ Support/ 2>/dev/null
@@ -33,8 +34,11 @@ ls ~/Library/Containers/ 2>/dev/null
 Also check for tools listed in the `Brewfile` that might have config:
 
 ```bash
-grep -E '^brew |^cask ' Brewfile | awk '{print $2}' | tr -d '"'
+grep -E '^brew |^cask ' Brewfile | awk '{print $2}' | tr -d '"' | sed 's|.*/||'
 ```
+
+The `sed` strips tap prefixes (e.g. `hasansezertasan/tap/cobo` → `cobo`) so
+tapped formulas match leaf-name-based config paths and `PACKAGES` entries.
 
 For each tool with config, record: path, file count, total size, file modes.
 
