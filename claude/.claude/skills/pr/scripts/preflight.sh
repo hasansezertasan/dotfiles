@@ -267,6 +267,9 @@ while IFS= read -r f; do
     attr_file_found=yes
   fi
 done < <({
+  if [ -n "${range:-}" ]; then
+    git diff --name-only "$range" 2>/dev/null
+  fi
   if [ "$has_head" = yes ]; then
     git diff HEAD --name-only 2>/dev/null
   fi
