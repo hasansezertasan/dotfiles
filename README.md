@@ -103,7 +103,10 @@ The `agents` package manages only `~/.agents/.skill-lock.json`, the portable
 manifest used by the `skills` CLI to restore globally installed skills. The
 generated `~/.agents/skills/` content remains local and ignored. The CLI writes
 through the manifest symlink, so global skill additions and updates remain
-visible as repository changes.
+visible as repository changes. On a machine that already has a regular
+manifest, `link.sh check` previews its adoption and `link.sh install` adopts it
+into the repository package before creating the symlink; the local manifest is
+therefore preserved as the source of truth.
 
 The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
 `known_hosts`, sockets, and other machine-maintained SSH data must remain

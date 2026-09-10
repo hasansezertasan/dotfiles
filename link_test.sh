@@ -147,6 +147,13 @@ test_existing_skill_lock_is_adopted() {
   cp "${DOTFILES_DIR}/agents/.agents/.skill-lock.json" \
     "${home}/.agents/.skill-lock.json"
 
+  if ! run_link "${home}" check > /dev/null 2>&1; then
+    fail "check rejected an existing Skills CLI manifest"
+  fi
+  if [ -L "${home}/.agents/.skill-lock.json" ]; then
+    fail "check modified the existing Skills CLI manifest"
+  fi
+
   run_link "${home}" install > /dev/null
 
   local target resolved

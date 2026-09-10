@@ -49,3 +49,13 @@ The `agents` Stow package contains only
 `agents/.agents/.skill-lock.json`. The existing `.gitignore` rule excludes
 `.agents/skills/`, preventing generated skill content from being staged while
 allowing the lock manifest to remain tracked.
+
+## Existing-manifest migration
+
+Stow normally rejects a regular target file, so an existing Skills CLI manifest
+would otherwise abort the whole multi-package install. `link.sh` detects that
+specific target and invokes Stow's `--adopt` mode for the `agents` package
+alone. Adoption moves the local manifest into the package path and replaces it
+with the expected symlink. The remaining packages are still stowed without
+`--adopt`, so their conflicts remain protective. Simulation with `link.sh
+check` previews this adoption without changing either manifest.
