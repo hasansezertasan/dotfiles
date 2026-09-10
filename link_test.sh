@@ -138,6 +138,33 @@ test_uninstall_removes_every_link() {
   rm -rf "${home}"
 }
 
+test_existing_skill_lock_is_adopted() {
+  echo "an existing Skills CLI manifest is adopted into the agents package"
+  local home
+  home="$(make_home)"
+
+  mkdir -p "${home}/.agents"
+  cp "${DOTFILES_DIR}/agents/.agents/.skill-lock.json" \
+    "${home}/.agents/.skill-lock.json"
+
+  run_link "${home}" install > /dev/null
+
+  local target resolved
+  target="${home}/.agents/.skill-lock.json"
+  if [ ! -L "${target}" ]; then
+    fail ".agents/.skill-lock.json was not replaced with a symlink"
+  elif [ ! -e "${target}" ]; then
+    fail ".agents/.skill-lock.json is a broken symlink"
+  else
+    resolved="$(resolve_link "${target}")"
+    if [ "${resolved}" != "${DOTFILES_DIR}/agents/.agents/.skill-lock.json" ]; then
+      fail ".agents/.skill-lock.json resolves to ${resolved}, not the agents package"
+    fi
+  fi
+
+  rm -rf "${home}"
+}
+
 test_conflict_is_refused() {
   echo "an existing file is refused, not overwritten or partially applied"
   local home
@@ -190,6 +217,7 @@ fi
 test_install_creates_expected_links
 test_shared_directories_are_not_links
 test_uninstall_removes_every_link
+test_existing_skill_lock_is_adopted
 test_conflict_is_refused
 test_usage_is_rejected
 
