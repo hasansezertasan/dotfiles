@@ -61,10 +61,10 @@ such as `~/.claude` and `~/.config` are linked individually, leaving those
 directories available for application-owned state.
 
 Existing files and incorrect links are treated as conflicts. The sole exception
-is a regular `~/.agents/.skill-lock.json`: `install` adopts that portable
-manifest into the `agents` package, preserving its local contents before
-linking it. Move or back up every other conflicting target explicitly, then
-rerun the script.
+is a regular `~/.agents/.skill-lock.json`: `install` and `restow` adopt that
+portable manifest into the `agents` package, preserving its local contents
+before linking it. Move or back up every other conflicting target explicitly,
+then rerun the script.
 
 ### Git
 
@@ -107,9 +107,9 @@ manifest used by the `skills` CLI to restore globally installed skills. The
 generated `~/.agents/skills/` content remains local and ignored. The CLI writes
 through the manifest symlink, so global skill additions and updates remain
 visible as repository changes. On a machine that already has a regular
-manifest, `link.sh check` previews its adoption and `link.sh install` adopts it
-into the repository package before creating the symlink; the local manifest is
-therefore preserved as the source of truth.
+manifest, `link.sh check` previews its adoption and `link.sh install` or
+`link.sh restow` adopts it into the repository package before creating the
+symlink; the local manifest is therefore preserved as the source of truth.
 
 The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
 `known_hosts`, sockets, and other machine-maintained SSH data must remain
