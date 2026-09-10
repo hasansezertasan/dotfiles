@@ -40,9 +40,13 @@ Key architectural properties:
   posting sticky comments on PRs from forks where `pull_request` receives a
   read-only token. It is safe because no repository code from the PR is checked
   out or executed.
-- **Subject restrictions**: Configured with `subjectPattern: ^.*[^.]$` to reject
-  trailing periods in PR titles, aligning server-side validation with local
-  `preflight.sh` and `SKILL.md` rules.
+- **Scope and subject restrictions**: Configured with `scopes: | \n [a-z0-9._/-]+`
+  to match the repository's optional lowercase scope grammar, and
+  `subjectPattern: ^.*[^.]$` to reject trailing periods in PR titles, aligning
+  server-side validation with local `preflight.sh` and `SKILL.md` rules.
+- **Concurrency**: Governed by `concurrency.group` keyed to the PR number with
+  `cancel-in-progress: true` to prevent race conditions from superseded runs
+  re-posting outdated sticky error comments.
 - **Feedback**: Uses `marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88`
   (v3.0.5) to post a descriptive error comment if the title does not conform, and
   automatically deletes the comment once the title is corrected.
@@ -55,12 +59,16 @@ The workflow checks the PR head branch name (`github.head_ref`) against the
 Key architectural properties:
 - **Dependency-free execution**: Implemented as an inline Bash script using regex
   matching, avoiding unmaintained third-party actions or deprecated Node runtimes.
-- **Allowed types**: Aligned with this repository's branch policy in `preflight.sh`
-  and `SKILL.md`:
+- **Allowed types and semantic bans**: Aligned with this repository's branch
+  policy in `preflight.sh` and `SKILL.md`:
   - Purpose prefixes: `feature`, `bugfix`, `hotfix`, `release`, `chore` (excluding
     short forms like `feat`/`fix` and AI-agent prefixes)
   - Descriptions: hyphen-separated lowercase alphanumerics only (excluding periods)
+  - Semantic bans: rejects standalone dead words/placeholders (`wip`, `tmp`,
+    `test`, etc.) and bare date descriptions
 - **Whitelists**: Allows automated branches such as `renovate/*` and `release-please--*`.
+- **Concurrency**: Governed by `cancel-in-progress: true` to cancel superseded
+  checks on new pushes.
 - **Security**: The untrusted `github.head_ref` is passed strictly through the
   `BRANCH_NAME` environment variable rather than inline `${{ github.head_ref }}`
   interpolation, preventing script injection. No PR code is checked out.

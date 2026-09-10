@@ -7,6 +7,11 @@ on:
   # PR title, and the untrusted error_message is passed via a step output.
   pull_request_target:  # zizmor: ignore[dangerous-triggers]
     types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   main:
     name: Validate PR title
@@ -19,6 +24,9 @@ jobs:
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50  # v6
         id: lint_pr_title
         with:
+          # In this repository, optional scopes must be lowercase [a-z0-9._/-]+ matching preflight.
+          scopes: |
+            [a-z0-9._/-]+
           # In this repository, commit and PR subjects must not end with a trailing period.
           subjectPattern: ^.*[^.]$
           subjectPatternError: |

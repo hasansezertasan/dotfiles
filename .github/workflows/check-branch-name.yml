@@ -7,6 +7,11 @@ on:
   # (github.head_ref) is read through env, never interpolated into a shell.
   pull_request_target:  # zizmor: ignore[dangerous-triggers]
     types: [opened, reopened, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   main:
     name: Validate branch name
@@ -36,7 +41,19 @@ jobs:
           # never leading, trailing, or consecutive (per the spec's naming rules).
           desc='[a-z0-9]+(-[a-z0-9]+)*'
           pattern="^(renovate/.+|release-please--.+|(${purpose})/${desc})$"
+          dead_words='^(wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|final|new|branch|test)$'
+          bare_date='^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'
           if [[ "${BRANCH_NAME}" =~ ${pattern} ]]; then
+            branch_desc="${BRANCH_NAME#*/}"
+            if [[ "${BRANCH_NAME}" =~ ^(${purpose})/ ]]; then
+              if [[ "${branch_desc}" =~ ${dead_words} ]]; then
+                echo "error_message=Branch \"${BRANCH_NAME}\" description cannot be a placeholder or dead word (\`${branch_desc}\`)." >> "${GITHUB_OUTPUT}"
+                exit 1
+              elif [[ "${branch_desc}" =~ ${bare_date} ]]; then
+                echo "error_message=Branch \"${BRANCH_NAME}\" description cannot be a bare date (\`${branch_desc}\`)." >> "${GITHUB_OUTPUT}"
+                exit 1
+              fi
+            fi
             echo "Branch \"${BRANCH_NAME}\" follows the Conventional Branch format."
           else
             {

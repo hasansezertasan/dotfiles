@@ -24,6 +24,7 @@ Both workflows are proven, static GitHub Actions gates:
 1. `check-pr-title.yml` runs `amannn/action-semantic-pull-request` pinned by SHA
    to validate PR titles against Conventional Commits, with sticky comment
    feedback via `marocchino/sticky-pull-request-comment`. It enforces
+   `scopes: [a-z0-9._/-]+` for optional lowercase scopes and
    `subjectPattern: ^.*[^.]$` to disallow trailing periods in PR titles,
    matching local PR rules.
 2. `check-branch-name.yml` validates `github.head_ref` against Conventional
@@ -31,11 +32,13 @@ Both workflows are proven, static GitHub Actions gates:
    dependencies, providing matching sticky error comments. It aligns with
    repository branch policy by restricting types to
    `feature|bugfix|hotfix|release|chore` with kebab-case hyphen-separated
-   descriptions, while permitting automated branches (`renovate/*`, `release-please--*`).
+   descriptions and semantic bans on dead words and bare dates, while
+   permitting automated branches (`renovate/*`, `release-please--*`).
 
-Both workflows safely run on `pull_request_target` with `pull-requests: write`
-permissions so they can comment on pull requests from forks, while avoiding
-security risks by never checking out or executing code from the PR.
+Both workflows use per-PR concurrency groups with `cancel-in-progress: true` to
+prevent race conditions from superseded runs, and safely run on
+`pull_request_target` with `pull-requests: write` permissions so they can comment
+on pull requests from forks without checking out or executing code from the PR.
 
 ### Consequences
 
