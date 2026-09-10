@@ -26,8 +26,9 @@ operations update the tracked copy rather than replacing the link.
 When the target manifest already exists as a regular file, `link.sh` uses
 Stow's adoption mode for the `agents` package only. That preserves the existing
 local manifest by adopting its contents into the package, then creating the
-symlink. The other packages continue to reject conflicts rather than adopting
-unrelated local configuration.
+symlink. Before that mutation, it simulates all non-agent packages; their
+conflicts abort the operation without adopting the manifest. The other packages
+continue to reject conflicts rather than adopting unrelated local configuration.
 
 ### Consequences
 

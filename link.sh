@@ -50,6 +50,10 @@ adopt_skill_lock() {
   fi
 }
 
+preflight_non_agents() {
+  run_non_agents_stow --simulate "$@"
+}
+
 case "${1:-}" in
   check)
     if skill_lock_needs_adoption; then
@@ -60,10 +64,16 @@ case "${1:-}" in
     fi
     ;;
   install)
+    if skill_lock_needs_adoption; then
+      preflight_non_agents
+    fi
     adopt_skill_lock
     run_stow
     ;;
   restow)
+    if skill_lock_needs_adoption; then
+      preflight_non_agents --restow
+    fi
     adopt_skill_lock
     run_stow --restow
     ;;

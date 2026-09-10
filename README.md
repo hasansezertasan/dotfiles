@@ -60,8 +60,11 @@ The script uses Stow's `--no-folding` option. Files inside shared directories
 such as `~/.claude` and `~/.config` are linked individually, leaving those
 directories available for application-owned state.
 
-Existing files and incorrect links are treated as conflicts. The script never
-overwrites or adopts them; move or back them up explicitly, then rerun it.
+Existing files and incorrect links are treated as conflicts. The sole exception
+is a regular `~/.agents/.skill-lock.json`: `install` adopts that portable
+manifest into the `agents` package, preserving its local contents before
+linking it. Move or back up every other conflicting target explicitly, then
+rerun the script.
 
 ### Git
 
@@ -77,9 +80,9 @@ mv ~/.gitconfig ~/.gitconfig.backup
 ./link.sh install
 ```
 
-The same applies to any newly managed path. Stow abandons the whole invocation
-on a conflict, so nothing is linked until every conflicting target has been
-moved aside.
+The same applies to any newly managed path other than the agents skill lock.
+Stow abandons the whole invocation on a conflict, so the skill lock is adopted
+only after the remaining packages have passed a simulated preflight.
 
 ### Command-line tools
 

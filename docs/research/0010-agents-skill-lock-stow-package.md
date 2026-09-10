@@ -59,3 +59,7 @@ alone. Adoption moves the local manifest into the package path and replaces it
 with the expected symlink. The remaining packages are still stowed without
 `--adopt`, so their conflicts remain protective. Simulation with `link.sh
 check` previews this adoption without changing either manifest.
+
+`install` and `restow` first simulate the non-agent packages when adoption is
+needed. This preflight prevents an unrelated conflict from aborting the final
+Stow run after adoption has already changed the target and package manifest.
