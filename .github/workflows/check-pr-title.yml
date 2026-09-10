@@ -18,6 +18,11 @@ jobs:
       - name: Lint PR Title
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50  # v6
         id: lint_pr_title
+        with:
+          # In this repository, commit and PR subjects must not end with a trailing period.
+          subjectPattern: ^.*[^.]$
+          subjectPatternError: |
+            The subject "{subject}" found in pull request title "{title}" must not end with a trailing period.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88  # v3.0.5

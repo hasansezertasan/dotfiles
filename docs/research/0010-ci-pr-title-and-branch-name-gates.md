@@ -40,6 +40,9 @@ Key architectural properties:
   posting sticky comments on PRs from forks where `pull_request` receives a
   read-only token. It is safe because no repository code from the PR is checked
   out or executed.
+- **Subject restrictions**: Configured with `subjectPattern: ^.*[^.]$` to reject
+  trailing periods in PR titles, aligning server-side validation with local
+  `preflight.sh` and `SKILL.md` rules.
 - **Feedback**: Uses `marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88`
   (v3.0.5) to post a descriptive error comment if the title does not conform, and
   automatically deletes the comment once the title is corrected.
@@ -52,9 +55,11 @@ The workflow checks the PR head branch name (`github.head_ref`) against the
 Key architectural properties:
 - **Dependency-free execution**: Implemented as an inline Bash script using regex
   matching, avoiding unmaintained third-party actions or deprecated Node runtimes.
-- **Allowed types**: Matches the Conventional Branch standard:
-  - Purpose prefixes: `feature`, `feat`, `bugfix`, `fix`, `hotfix`, `release`, `chore`
-  - Agent prefixes: `ai`, `copilot`, `cursor`, `claude`, `codex`
+- **Allowed types**: Aligned with this repository's branch policy in `preflight.sh`
+  and `SKILL.md`:
+  - Purpose prefixes: `feature`, `bugfix`, `hotfix`, `release`, `chore` (excluding
+    short forms like `feat`/`fix` and AI-agent prefixes)
+  - Descriptions: hyphen-separated lowercase alphanumerics only (excluding periods)
 - **Whitelists**: Allows automated branches such as `renovate/*` and `release-please--*`.
 - **Security**: The untrusted `github.head_ref` is passed strictly through the
   `BRANCH_NAME` environment variable rather than inline `${{ github.head_ref }}`
@@ -64,16 +69,16 @@ Key architectural properties:
 
 ## Compatibility with existing dotfiles tooling
 
-The regex patterns and type vocabularies in both workflows directly complement
-the dotfiles repository's existing standards:
+The adopted workflows directly reinforce the dotfiles repository's existing
+standards:
 - All historical squash commits in this repository use Conventional Commits
   (e.g., `feat(...)`, `fix(...)`, `ci(...)`).
-- The branch naming rules match the Conventional Branch conventions documented
-  in `claude/.claude/skills/pr/SKILL.md` and checked in `preflight.sh`.
+- The branch naming rules and subject validation match the exact policies
+  documented in `claude/.claude/skills/pr/SKILL.md` and checked in `preflight.sh`.
 
 ## Conclusion
 
-Adopt both workflows into `.github/workflows/` verbatim from
-`hasansezertasan/copier-pyproject`. They require no template substitution,
+Adopt both workflows into `.github/workflows/`, configured to mirror the local
+PR and branch naming constraints. They require no template substitution,
 introduce no insecure checkout patterns, and provide automated feedback for all
 incoming pull requests.

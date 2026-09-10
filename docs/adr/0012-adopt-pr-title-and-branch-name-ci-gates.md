@@ -23,10 +23,15 @@ Chosen option: "Adopt `check-pr-title.yml` and `check-branch-name.yml` from
 Both workflows are proven, static GitHub Actions gates:
 1. `check-pr-title.yml` runs `amannn/action-semantic-pull-request` pinned by SHA
    to validate PR titles against Conventional Commits, with sticky comment
-   feedback via `marocchino/sticky-pull-request-comment`.
+   feedback via `marocchino/sticky-pull-request-comment`. It enforces
+   `subjectPattern: ^.*[^.]$` to disallow trailing periods in PR titles,
+   matching local PR rules.
 2. `check-branch-name.yml` validates `github.head_ref` against Conventional
    Branch conventions using an inline Bash script without unmaintained action
-   dependencies, providing matching sticky error comments.
+   dependencies, providing matching sticky error comments. It aligns with
+   repository branch policy by restricting types to
+   `feature|bugfix|hotfix|release|chore` with kebab-case hyphen-separated
+   descriptions, while permitting automated branches (`renovate/*`, `release-please--*`).
 
 Both workflows safely run on `pull_request_target` with `pull-requests: write`
 permissions so they can comment on pull requests from forks, while avoiding
