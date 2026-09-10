@@ -1,0 +1,88 @@
+---
+name: Lint branch name
+on:
+  # pull_request_target is required so this check can post its sticky comment on
+  # PRs from forks (a plain `pull_request` run gets a read-only token). It is safe
+  # here: no PR code is checked out or executed, and the only untrusted value
+  # (github.head_ref) is read through env, never interpolated into a shell.
+  pull_request_target:  # zizmor: ignore[dangerous-triggers]
+    types: [opened, reopened, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    name: Validate branch name
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Lint branch name
+        id: lint_branch_name
+        env:
+          # github.head_ref is the PR's source branch. Read it through env (not
+          # inline ${{ }}) so an attacker-controlled fork branch name cannot be
+          # injected into the shell — this is why pull_request_target is safe
+          # here: we never check out or execute the PR's code.
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          # Conventional Branch (https://conventionalbranch.org/): a type prefix
+          # followed by a short description. In this repository, allowed types are
+          # the 5 Conventional Branch purpose types aligned with preflight.sh and
+          # claude/.claude/skills/pr/SKILL.md (agent prefixes and short types like feat
+          # are excluded; descriptions are lowercase alphanumerics and hyphens only).
+          # renovate/* and release-please--* are whitelisted so the automated
+          # dependency and release PRs are never blocked by this check.
+          purpose='feature|bugfix|hotfix|release|chore'
+          # Description: lowercase alphanumerics with single '-' separators,
+          # never leading, trailing, or consecutive (per the spec's naming rules).
+          desc='[a-z0-9]+(-[a-z0-9]+)*'
+          pattern="^(renovate/.+|release-please--.+|(${purpose})/${desc})$"
+          dead_words='^(wip|tmp|temp|foo|bar|baz|stuff|misc|things|changes|update|updates|final|new|branch|test)$'
+          bare_date='^([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8})$'
+          if [[ "${BRANCH_NAME}" =~ ${pattern} ]]; then
+            branch_desc="${BRANCH_NAME#*/}"
+            if [[ "${BRANCH_NAME}" =~ ^(${purpose})/ ]]; then
+              if [[ "${branch_desc}" =~ ${dead_words} ]]; then
+                echo "error_message=Branch \"${BRANCH_NAME}\" description cannot be a placeholder or dead word (\`${branch_desc}\`)." >> "${GITHUB_OUTPUT}"
+                exit 1
+              elif [[ "${branch_desc}" =~ ${bare_date} ]]; then
+                echo "error_message=Branch \"${BRANCH_NAME}\" description cannot be a bare date (\`${branch_desc}\`)." >> "${GITHUB_OUTPUT}"
+                exit 1
+              fi
+            fi
+            echo "Branch \"${BRANCH_NAME}\" follows the Conventional Branch format."
+          else
+            {
+              echo "error_message=Branch \"${BRANCH_NAME}\" must follow the" \
+                "Conventional Branch format \`<type>/<description>\`" \
+                "(e.g. \`feature/add-login\`). Allowed types: ${purpose//|/, }" \
+                "(lowercase alphanumerics and hyphens only)."
+            } >> "${GITHUB_OUTPUT}"
+            exit 1
+          fi
+      - uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88  # v3.0.5
+        # When the previous step fails, the workflow would stop. By adding this
+        # condition you can continue the execution with the populated error message.
+        if: always() && (steps.lint_branch_name.outputs.error_message != null)
+        with:
+          header: branch-name-lint-error
+          message: |
+            Hey there and thank you for opening this pull request! 👋🏼
+
+            We require branch names to follow the [Conventional Branch](https://conventional-branch.github.io/) specification and it looks like your branch name needs to be adjusted.
+
+            Details:
+
+            ```
+            ${{ steps.lint_branch_name.outputs.error_message }}
+            ```
+      # Delete a previous comment when the branch name has been fixed.
+      - if: ${{ steps.lint_branch_name.outputs.error_message == null }}
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88  # v3.0.5
+        with:
+          header: branch-name-lint-error
+          delete: true
