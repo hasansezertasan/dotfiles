@@ -10,6 +10,7 @@ readonly DOTFILES_DIR
 
 # Paths the packages are expected to place in the target directory.
 readonly -a EXPECTED_LINKS=(
+  .agents/.skill-lock.json
   .claude/CLAUDE.md
   .codex/hooks.json
   .config/atuin/config.toml
@@ -29,6 +30,7 @@ readonly -a EXPECTED_LINKS=(
 # --no-folding must leave these as real directories so applications can keep
 # their own state alongside the managed files.
 readonly -a EXPECTED_DIRS=(
+  .agents
   .claude
   .codex
   .config

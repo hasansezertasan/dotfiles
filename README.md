@@ -38,8 +38,8 @@ default handler for a list of file types, which needs the app present.
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`, `opencode`,
-`ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
+manages `agents`, `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`,
+`opencode`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
 adding a directory to the repository cannot unexpectedly change `$HOME`.
 
 Preview changes before installing:
@@ -98,6 +98,12 @@ Because Git records only `644` and `755`, linking a configuration file that was
 which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Additional tool configuration
+
+The `agents` package manages only `~/.agents/.skill-lock.json`, the portable
+manifest used by the `skills` CLI to restore globally installed skills. The
+generated `~/.agents/skills/` content remains local and ignored. The CLI writes
+through the manifest symlink, so global skill additions and updates remain
+visible as repository changes.
 
 The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
 `known_hosts`, sockets, and other machine-maintained SSH data must remain
