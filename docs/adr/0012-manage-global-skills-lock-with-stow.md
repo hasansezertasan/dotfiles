@@ -1,0 +1,44 @@
+# Manage the Global Skills Lock with a Narrow Stow Package
+
+## Context and Problem Statement
+
+The Skills CLI records globally installed skills in
+`~/.agents/.skill-lock.json`, while its adjacent `~/.agents/skills/` directory
+holds generated installed content. The portable manifest should be restored on
+a new machine without committing generated skill trees.
+
+## Considered Options
+
+* Manage only the global skill-lock manifest
+* Manage the entire `~/.agents` directory
+* Leave the Skills CLI state unmanaged
+
+## Decision Outcome
+
+Chosen option: "Manage only the global skill-lock manifest", because it
+preserves portable skill provenance while excluding generated content.
+
+Add the `agents` package to the fixed `link.sh` package list. It links only
+`~/.agents/.skill-lock.json`; `.agents/skills/` remains ignored and local. The
+Skills CLI was verified to write through the manifest symlink, so global skill
+operations update the tracked copy rather than replacing the link.
+
+When the target manifest already exists as a regular file, `link.sh` uses
+Stow's adoption mode for the `agents` package only. That preserves the existing
+local manifest by adopting its contents into the package, then creating the
+symlink. Before that mutation, it simulates all non-agent packages; their
+conflicts abort the operation without adopting the manifest. The other packages
+continue to reject conflicts rather than adopting unrelated local configuration.
+
+### Consequences
+
+* Good, because a fresh machine can restore the same global skill selection.
+* Good, because generated installed skill directories are not versioned.
+* Good, because existing Skills CLI users can migrate without discarding their
+  local manifest.
+* Bad, because skill content must still be installed or restored locally.
+* Bad, because using `XDG_STATE_HOME` changes the CLI's manifest location.
+
+## Related Research
+
+* [Stow boundary for the global Skills CLI manifest](../research/0010-agents-skill-lock-stow-package.md)

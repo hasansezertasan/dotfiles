@@ -10,6 +10,7 @@ readonly DOTFILES_DIR
 
 # Paths the packages are expected to place in the target directory.
 readonly -a EXPECTED_LINKS=(
+  .agents/.skill-lock.json
   .claude/CLAUDE.md
   .codex/hooks.json
   .config/atuin/config.toml
@@ -29,6 +30,7 @@ readonly -a EXPECTED_LINKS=(
 # --no-folding must leave these as real directories so applications can keep
 # their own state alongside the managed files.
 readonly -a EXPECTED_DIRS=(
+  .agents
   .claude
   .codex
   .config
@@ -69,6 +71,12 @@ run_link() {
   local home="$1"
   shift
   HOME="${home}" "${DOTFILES_DIR}/link.sh" "$@"
+}
+
+run_link_from() {
+  local repo="$1" home="$2"
+  shift 2
+  HOME="${home}" "${repo}/link.sh" "$@"
 }
 
 test_install_creates_expected_links() {
@@ -136,6 +144,67 @@ test_uninstall_removes_every_link() {
   rm -rf "${home}"
 }
 
+test_existing_skill_lock_is_adopted() {
+  echo "an existing Skills CLI manifest is adopted into the agents package"
+  local home fixture
+  home="$(make_home)"
+  fixture="$(make_home)"
+  fixture="$(cd -- "${fixture}" && pwd -P)"
+  cp -R "${DOTFILES_DIR}/." "${fixture}"
+
+  mkdir -p "${home}/.agents"
+  printf '%s\n' \
+    '{"version":3,"skills":{"fixture-local":{"source":"example/skills","sourceType":"github","sourceUrl":"https://example.invalid/skills.git","skillPath":"skills/fixture/SKILL.md","skillFolderHash":"0000000000000000000000000000000000000000","installedAt":"2026-09-10T00:00:00.000Z","updatedAt":"2026-09-10T00:00:00.000Z"}},"dismissed":{},"lastSelectedAgents":[]}' \
+    > "${home}/.agents/.skill-lock.json"
+
+  if ! run_link_from "${fixture}" "${home}" check > /dev/null 2>&1; then
+    fail "check rejected an existing Skills CLI manifest"
+  fi
+  if [ -L "${home}/.agents/.skill-lock.json" ]; then
+    fail "check modified the existing Skills CLI manifest"
+  fi
+
+  run_link_from "${fixture}" "${home}" install > /dev/null
+
+  local target resolved
+  target="${home}/.agents/.skill-lock.json"
+  if [ ! -L "${target}" ]; then
+    fail ".agents/.skill-lock.json was not replaced with a symlink"
+  elif [ ! -e "${target}" ]; then
+    fail ".agents/.skill-lock.json is a broken symlink"
+  else
+    resolved="$(resolve_link "${target}")"
+    if [ "${resolved}" != "${fixture}/agents/.agents/.skill-lock.json" ]; then
+      fail ".agents/.skill-lock.json resolves to ${resolved}, not the agents package"
+    elif ! grep -q 'fixture-local' "${fixture}/agents/.agents/.skill-lock.json"; then
+      fail ".agents/.skill-lock.json did not preserve the local manifest contents"
+    fi
+  fi
+
+  rm -rf "${home}"
+  rm -rf "${fixture}"
+}
+
+test_conflict_prevents_skill_lock_adoption() {
+  echo "an unrelated conflict prevents skill-lock adoption"
+  local home
+  home="$(make_home)"
+
+  mkdir -p "${home}/.agents"
+  cp "${DOTFILES_DIR}/agents/.agents/.skill-lock.json" \
+    "${home}/.agents/.skill-lock.json"
+  printf '%s\n' "original contents" > "${home}/.gitconfig"
+
+  if run_link "${home}" install > /dev/null 2>&1; then
+    fail "install succeeded despite an unrelated conflict"
+  fi
+  if [ -L "${home}/.agents/.skill-lock.json" ]; then
+    fail ".agents/.skill-lock.json was adopted despite an unrelated conflict"
+  fi
+
+  rm -rf "${home}"
+}
+
 test_conflict_is_refused() {
   echo "an existing file is refused, not overwritten or partially applied"
   local home
@@ -188,6 +257,8 @@ fi
 test_install_creates_expected_links
 test_shared_directories_are_not_links
 test_uninstall_removes_every_link
+test_existing_skill_lock_is_adopted
+test_conflict_prevents_skill_lock_adoption
 test_conflict_is_refused
 test_usage_is_rejected
 

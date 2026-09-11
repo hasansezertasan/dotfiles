@@ -1,0 +1,393 @@
+{
+  "version": 3,
+  "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "76a98a285cb0434f3d39e1a873823556330e398b",
+      "installedAt": "2026-08-24T10:26:43.086Z",
+      "updatedAt": "2026-08-24T10:26:43.086Z"
+    },
+    "python-logging-best-practices": {
+      "source": "terrylica/cc-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/terrylica/cc-skills.git",
+      "skillPath": "plugins/devops-tools/skills/python-logging-best-practices/SKILL.md",
+      "skillFolderHash": "132abe264e35c1294695a18cba3fe461f1c88344",
+      "installedAt": "2026-08-24T10:41:59.049Z",
+      "updatedAt": "2026-08-24T10:43:05.777Z"
+    },
+    "python-observability": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "plugins/python-development/skills/python-observability/SKILL.md",
+      "skillFolderHash": "13c0d0715bbcd9012ea02865a571935a6b426768",
+      "installedAt": "2026-08-24T10:42:24.205Z",
+      "updatedAt": "2026-08-24T10:42:53.611Z"
+    },
+    "python-guidelines": {
+      "source": "community-of-python/pylines",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/community-of-python/pylines.git",
+      "skillPath": "pylines-skill/SKILL.md",
+      "skillFolderHash": "37c3ed04d3af31f19b4c76e33fbe5cb29260779f",
+      "installedAt": "2026-08-24T10:44:12.420Z",
+      "updatedAt": "2026-08-24T10:44:12.420Z"
+    },
+    "migrate-to-codex": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/openai/skills.git",
+      "skillPath": "skills/.curated/migrate-to-codex/SKILL.md",
+      "skillFolderHash": "62a1195f8b60b67a2b51471c35273a109ec757fc",
+      "installedAt": "2026-08-24T10:45:06.257Z",
+      "updatedAt": "2026-08-24T10:45:06.257Z"
+    },
+    "architecture-decision-records": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "plugins/documentation-generation/skills/architecture-decision-records/SKILL.md",
+      "skillFolderHash": "75227f18c39b855d72a328e3c4b5abc74144a4aa",
+      "installedAt": "2026-09-03T12:10:28.601Z",
+      "updatedAt": "2026-09-03T12:10:28.601Z"
+    },
+    "agy-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/agy-delegate/SKILL.md",
+      "skillFolderHash": "f78b533ef4a9967842645aa0bdf1a1e89b3a3e06",
+      "installedAt": "2026-09-07T13:04:26.890Z",
+      "updatedAt": "2026-09-07T13:04:54.362Z"
+    },
+    "aider-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/aider-delegate/SKILL.md",
+      "skillFolderHash": "e1b9047b7d1cbef660b938b8db35ddcb259d98ad",
+      "installedAt": "2026-09-07T13:04:26.892Z",
+      "updatedAt": "2026-09-07T13:04:54.365Z"
+    },
+    "claude-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/claude-delegate/SKILL.md",
+      "skillFolderHash": "63210002e8b3e173a5cb2767d96628da91f23f85",
+      "installedAt": "2026-09-07T13:04:26.893Z",
+      "updatedAt": "2026-09-07T13:04:54.366Z"
+    },
+    "cline-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/cline-delegate/SKILL.md",
+      "skillFolderHash": "4b5960b9f5e08e2fb3ad52fcd773e7adc398c36e",
+      "installedAt": "2026-09-07T13:04:26.894Z",
+      "updatedAt": "2026-09-07T13:04:54.366Z"
+    },
+    "codex-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/codex-delegate/SKILL.md",
+      "skillFolderHash": "bdf609edc79b315e2b53d110775d2a0c2ab0ef6f",
+      "installedAt": "2026-09-07T13:04:26.894Z",
+      "updatedAt": "2026-09-07T13:04:54.367Z"
+    },
+    "commandcode-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/commandcode-delegate/SKILL.md",
+      "skillFolderHash": "a2ac40e58e32128dd977cd9e4c4bcb8ad7847940",
+      "installedAt": "2026-09-07T13:04:26.895Z",
+      "updatedAt": "2026-09-07T13:04:54.367Z"
+    },
+    "copilot-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/copilot-delegate/SKILL.md",
+      "skillFolderHash": "ea58504aa1c02db896cb535be7d22371363c7ef7",
+      "installedAt": "2026-09-07T13:04:26.895Z",
+      "updatedAt": "2026-09-07T13:04:54.369Z"
+    },
+    "cursor-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/cursor-delegate/SKILL.md",
+      "skillFolderHash": "7b9edd461c02b178c4f640fb6a9e08a4c06834aa",
+      "installedAt": "2026-09-07T13:04:26.896Z",
+      "updatedAt": "2026-09-07T13:04:54.369Z"
+    },
+    "delegate-setup": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/delegate-setup/SKILL.md",
+      "skillFolderHash": "c0d895b36dfaeb168fb86f6742fd3e98a1a8f1d2",
+      "installedAt": "2026-09-07T13:04:26.896Z",
+      "updatedAt": "2026-09-07T13:04:54.370Z"
+    },
+    "grok-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/grok-delegate/SKILL.md",
+      "skillFolderHash": "7fb67fa30fc2d05e087b678905768faf42bb556c",
+      "installedAt": "2026-09-07T13:04:26.896Z",
+      "updatedAt": "2026-09-07T13:04:54.370Z"
+    },
+    "kimi-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/kimi-delegate/SKILL.md",
+      "skillFolderHash": "eae568e972200294af3fcf77f5d460b192b0304a",
+      "installedAt": "2026-09-07T13:04:26.897Z",
+      "updatedAt": "2026-09-07T13:04:54.371Z"
+    },
+    "omp-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/omp-delegate/SKILL.md",
+      "skillFolderHash": "37e56ab0d308976ed89713093300f9f1bb794069",
+      "installedAt": "2026-09-07T13:04:26.897Z",
+      "updatedAt": "2026-09-07T13:04:54.371Z"
+    },
+    "opencode-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/opencode-delegate/SKILL.md",
+      "skillFolderHash": "47e19b203bcd80270fe36b7b6388bf75462848ff",
+      "installedAt": "2026-09-07T13:04:26.897Z",
+      "updatedAt": "2026-09-07T13:04:54.373Z"
+    },
+    "pi-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/pi-delegate/SKILL.md",
+      "skillFolderHash": "4aa346ef31f914e546b316801fe49ea21070a6b5",
+      "installedAt": "2026-09-07T13:04:26.898Z",
+      "updatedAt": "2026-09-07T13:04:54.374Z"
+    },
+    "qoder-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/qoder-delegate/SKILL.md",
+      "skillFolderHash": "db7d658da8fb850eba3ac1c4706aa1e6176d2639",
+      "installedAt": "2026-09-07T13:04:26.898Z",
+      "updatedAt": "2026-09-07T13:04:54.376Z"
+    },
+    "vibe-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/vibe-delegate/SKILL.md",
+      "skillFolderHash": "3f0aa0944a40a1b52dcd7bbfb887a41aeb940c4f",
+      "installedAt": "2026-09-07T13:04:26.898Z",
+      "updatedAt": "2026-09-07T13:04:54.377Z"
+    },
+    "warp-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/warp-delegate/SKILL.md",
+      "skillFolderHash": "1cf3dc8bf5b2b367f53137b3cf981845f752b0b2",
+      "installedAt": "2026-09-07T13:04:26.899Z",
+      "updatedAt": "2026-09-07T13:04:54.377Z"
+    },
+    "zcode-delegate": {
+      "source": "amelnagdy/delegate-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/amelnagdy/delegate-skills.git",
+      "skillPath": "skills/zcode-delegate/SKILL.md",
+      "skillFolderHash": "f549779df6aaa2644fc7ab49b3d9a6d7b3885547",
+      "installedAt": "2026-09-07T13:04:26.899Z",
+      "updatedAt": "2026-09-07T13:04:54.378Z"
+    },
+    "open-code-review": {
+      "source": "alibaba/open-code-review",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/alibaba/open-code-review.git",
+      "skillPath": "skills/open-code-review/SKILL.md",
+      "skillFolderHash": "4e1f9432dbbd6e2949ee35e2bec9f0ceec41e637",
+      "installedAt": "2026-09-07T13:07:04.386Z",
+      "updatedAt": "2026-09-07T13:07:04.386Z"
+    },
+    "open-code-review-delegate": {
+      "source": "alibaba/open-code-review",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/alibaba/open-code-review.git",
+      "skillPath": "skills/open-code-review-delegate/SKILL.md",
+      "skillFolderHash": "763660a601ea4b9b75d2fdb679aa81fd205df461",
+      "installedAt": "2026-09-07T13:07:04.391Z",
+      "updatedAt": "2026-09-07T13:07:04.391Z"
+    },
+    "gitops-workflow": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "plugins/kubernetes-operations/skills/gitops-workflow/SKILL.md",
+      "skillFolderHash": "a3cb91f413faff1d3715c45cb4baf8338adaa039",
+      "installedAt": "2026-09-07T13:10:55.853Z",
+      "updatedAt": "2026-09-07T14:20:13.515Z"
+    },
+    "domain-driven-design": {
+      "source": "yonatangross/orchestkit",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/yonatangross/orchestkit.git",
+      "skillPath": "plugins/ork/skills/domain-driven-design/SKILL.md",
+      "skillFolderHash": "2f3aa609bdf699b2446cb4ccd92ca861cb678d30",
+      "installedAt": "2026-09-07T13:14:35.571Z",
+      "updatedAt": "2026-09-07T13:14:35.571Z"
+    },
+    "agent-orchestration": {
+      "source": "yonatangross/orchestkit",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/yonatangross/orchestkit.git",
+      "skillPath": "plugins/ork/skills/agent-orchestration/SKILL.md",
+      "skillFolderHash": "a41bd1731175c59878a60bd205e28e036971d523",
+      "installedAt": "2026-09-07T13:15:31.212Z",
+      "updatedAt": "2026-09-07T13:15:31.212Z"
+    },
+    "oh-my-issues": {
+      "source": "thedotmack/claude-mem",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/thedotmack/claude-mem.git",
+      "skillPath": "plugin/skills/oh-my-issues/SKILL.md",
+      "skillFolderHash": "0fb0dc3a8fe8ba5b4f2b0ce4a9b985dfb19bb60c",
+      "installedAt": "2026-09-07T13:18:44.939Z",
+      "updatedAt": "2026-09-07T13:18:44.939Z"
+    },
+    "github-triage": {
+      "source": "code-yeongyu/oh-my-openagent",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/code-yeongyu/oh-my-openagent.git",
+      "skillPath": ".agents/skills/github-triage/SKILL.md",
+      "skillFolderHash": "d24e61ab801c6e6b558dc252c60829423ce198ab",
+      "installedAt": "2026-09-07T13:19:16.772Z",
+      "updatedAt": "2026-09-07T13:19:16.772Z"
+    },
+    "babysit": {
+      "source": "thedotmack/claude-mem",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/thedotmack/claude-mem.git",
+      "skillPath": "plugin/skills/babysit/SKILL.md",
+      "skillFolderHash": "b7fe9ecec0a9ee15c6964fe9b0d1489a05ae6bdb",
+      "installedAt": "2026-09-07T13:20:12.147Z",
+      "updatedAt": "2026-09-07T13:20:12.147Z"
+    },
+    "devops-engineer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/jeffallan/claude-skills.git",
+      "skillPath": "skills/devops-engineer/SKILL.md",
+      "skillFolderHash": "9376c07c52d24a90ee14fe9f24fa28c164f9ec91",
+      "installedAt": "2026-09-07T13:20:48.900Z",
+      "updatedAt": "2026-09-07T13:26:00.333Z"
+    },
+    "context-engineering": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/addyosmani/agent-skills.git",
+      "skillPath": "skills/context-engineering/SKILL.md",
+      "skillFolderHash": "8912c45063ef4b48d56c0b12a3cb27c9747c1045",
+      "installedAt": "2026-09-07T13:21:03.691Z",
+      "updatedAt": "2026-09-07T13:21:03.691Z"
+    },
+    "prompt-engineering-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "plugins/llm-application-dev/skills/prompt-engineering-patterns/SKILL.md",
+      "skillFolderHash": "6370d6074cb1b75b09093e9804e6274f19069f48",
+      "installedAt": "2026-09-07T13:21:14.060Z",
+      "updatedAt": "2026-09-07T13:21:14.060Z"
+    },
+    "python-performance-optimization": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "plugins/python-development/skills/python-performance-optimization/SKILL.md",
+      "skillFolderHash": "08c2e271829ec9131a5a0b5d484d1a6a332c8a30",
+      "installedAt": "2026-09-07T13:21:44.146Z",
+      "updatedAt": "2026-09-07T13:21:44.146Z"
+    },
+    "terraform-engineer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/jeffallan/claude-skills.git",
+      "skillPath": "skills/terraform-engineer/SKILL.md",
+      "skillFolderHash": "b64f09a08220f14f48d0cda381c952666cb0e3fe",
+      "installedAt": "2026-09-07T13:25:55.091Z",
+      "updatedAt": "2026-09-07T13:25:55.091Z"
+    },
+    "devops-automation": {
+      "source": "claude-office-skills/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/claude-office-skills/skills.git",
+      "skillPath": "devops-automation/SKILL.md",
+      "skillFolderHash": "53bc5ff61c866544660a9b98976d7e0d7dc91ccd",
+      "installedAt": "2026-09-07T13:26:19.634Z",
+      "updatedAt": "2026-09-07T13:26:19.634Z"
+    },
+    "devops-deployment": {
+      "source": "yonatangross/orchestkit",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/yonatangross/orchestkit.git",
+      "skillPath": "plugins/ork/skills/devops-deployment/SKILL.md",
+      "skillFolderHash": "b393e51b3509c6c6d202faeece84846832bd98de",
+      "installedAt": "2026-09-07T13:26:44.299Z",
+      "updatedAt": "2026-09-07T13:26:44.299Z"
+    },
+    "ci-cd-and-automation": {
+      "source": "addyosmani/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/addyosmani/agent-skills.git",
+      "skillPath": "skills/ci-cd-and-automation/SKILL.md",
+      "skillFolderHash": "34db321777a17e268ac425f0f7f2501dda55c955",
+      "installedAt": "2026-09-07T13:27:49.635Z",
+      "updatedAt": "2026-09-07T13:27:49.635Z"
+    },
+    "orca-per-workspace-env": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orca-per-workspace-env/SKILL.md",
+      "skillFolderHash": "49103d96472ad790758f14cfc3ed5c69434a6f1b",
+      "installedAt": "2026-09-07T14:08:47.688Z",
+      "updatedAt": "2026-09-07T14:08:47.688Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "antigravity",
+    "antigravity-cli",
+    "cline",
+    "codex",
+    "cursor",
+    "deepagents",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-code-cli",
+    "opencode",
+    "warp",
+    "zed",
+    "claude-code"
+  ]
+}

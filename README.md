@@ -38,8 +38,8 @@ default handler for a list of file types, which needs the app present.
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`, `opencode`,
-`ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
+manages `agents`, `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`,
+`opencode`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
 adding a directory to the repository cannot unexpectedly change `$HOME`.
 
 Preview changes before installing:
@@ -60,8 +60,11 @@ The script uses Stow's `--no-folding` option. Files inside shared directories
 such as `~/.claude` and `~/.config` are linked individually, leaving those
 directories available for application-owned state.
 
-Existing files and incorrect links are treated as conflicts. The script never
-overwrites or adopts them; move or back them up explicitly, then rerun it.
+Existing files and incorrect links are treated as conflicts. The sole exception
+is a regular `~/.agents/.skill-lock.json`: `install` and `restow` adopt that
+portable manifest into the `agents` package, preserving its local contents
+before linking it. Move or back up every other conflicting target explicitly,
+then rerun the script.
 
 ### Git
 
@@ -77,9 +80,9 @@ mv ~/.gitconfig ~/.gitconfig.backup
 ./link.sh install
 ```
 
-The same applies to any newly managed path. Stow abandons the whole invocation
-on a conflict, so nothing is linked until every conflicting target has been
-moved aside.
+The same applies to any newly managed path other than the agents skill lock.
+Stow abandons the whole invocation on a conflict, so the skill lock is adopted
+only after the remaining packages have passed a simulated preflight.
 
 ### Command-line tools
 
@@ -98,6 +101,15 @@ Because Git records only `644` and `755`, linking a configuration file that was
 which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Additional tool configuration
+
+The `agents` package manages only `~/.agents/.skill-lock.json`, the portable
+manifest used by the `skills` CLI to restore globally installed skills. The
+generated `~/.agents/skills/` content remains local and ignored. The CLI writes
+through the manifest symlink, so global skill additions and updates remain
+visible as repository changes. On a machine that already has a regular
+manifest, `link.sh check` previews its adoption and `link.sh install` or
+`link.sh restow` adopts it into the repository package before creating the
+symlink; the local manifest is therefore preserved as the source of truth.
 
 The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
 `known_hosts`, sockets, and other machine-maintained SSH data must remain

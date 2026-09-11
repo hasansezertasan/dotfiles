@@ -1,4 +1,8 @@
+# The skills CLI regenerates installed skill content beside the portable lock
+# manifest. Only the manifest is managed by the agents package.
 .agents/skills/
+agents/.agents/*
+!agents/.agents/.skill-lock.json
 
 # gh stores the auth token here when no system keyring is available.
 gh/.config/gh/hosts.yml
