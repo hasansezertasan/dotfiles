@@ -334,105 +334,6 @@
       "installedAt": "2026-09-07T13:21:44.146Z",
       "updatedAt": "2026-09-07T13:21:44.146Z"
     },
-    "agentic-engineering": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/agentic-engineering/SKILL.md",
-      "skillFolderHash": "3911778d1fd81c8ea576a75f9e9e99d2a3dc6372",
-      "installedAt": "2026-09-07T13:22:01.087Z",
-      "updatedAt": "2026-09-07T13:24:39.050Z"
-    },
-    "ai-first-engineering": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/ai-first-engineering/SKILL.md",
-      "skillFolderHash": "f026d056d3c04d71da1e00f85ccc59ebd338652e",
-      "installedAt": "2026-09-07T13:23:05.175Z",
-      "updatedAt": "2026-09-07T13:23:05.175Z"
-    },
-    "backend-patterns": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/backend-patterns/SKILL.md",
-      "skillFolderHash": "70475f53e26735e2bed243107ff921c2c32cdca5",
-      "installedAt": "2026-09-07T13:23:26.408Z",
-      "updatedAt": "2026-09-07T13:26:17.693Z"
-    },
-    "council": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/council/SKILL.md",
-      "skillFolderHash": "a2faead77c2db3c18e20f00b888e8fa79b4b37ab",
-      "installedAt": "2026-09-07T13:23:32.238Z",
-      "updatedAt": "2026-09-07T13:23:47.224Z"
-    },
-    "content-engine": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/content-engine/SKILL.md",
-      "skillFolderHash": "e56fbcb5a355f44c63ddfe90090bf8523905b7fe",
-      "installedAt": "2026-09-07T13:24:17.848Z",
-      "updatedAt": "2026-09-07T13:24:17.848Z"
-    },
-    "everything-claude-code": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": ".agents/skills/everything-claude-code/SKILL.md",
-      "skillFolderHash": "f414de064c6d9e819d114ca9f56de5697a2dfecf",
-      "installedAt": "2026-09-07T13:24:58.938Z",
-      "updatedAt": "2026-09-07T13:24:58.938Z"
-    },
-    "python-testing": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/python-testing/SKILL.md",
-      "skillFolderHash": "230ac65eff21a3d61da4aa3613f2ced435a73ee0",
-      "installedAt": "2026-09-07T13:25:01.931Z",
-      "updatedAt": "2026-09-07T13:25:01.931Z"
-    },
-    "database-migrations": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/database-migrations/SKILL.md",
-      "skillFolderHash": "82b249443b6b12f1a4e05ed6ff91b90074c26d85",
-      "installedAt": "2026-09-07T13:25:21.398Z",
-      "updatedAt": "2026-09-07T13:25:21.398Z"
-    },
-    "e2e-testing": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/e2e-testing/SKILL.md",
-      "skillFolderHash": "e09a865ccb75967d1159adddec1090c26eb7df30",
-      "installedAt": "2026-09-07T13:25:25.595Z",
-      "updatedAt": "2026-09-07T13:25:25.595Z"
-    },
-    "tdd-workflow": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/tdd-workflow/SKILL.md",
-      "skillFolderHash": "04e9af68ba477034d3218a91faa1e796cf8116cc",
-      "installedAt": "2026-09-07T13:25:33.742Z",
-      "updatedAt": "2026-09-07T13:25:33.742Z"
-    },
-    "python-patterns": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/python-patterns/SKILL.md",
-      "skillFolderHash": "a760f82665c97712722cf849f7b0d24872678a70",
-      "installedAt": "2026-09-07T13:25:35.861Z",
-      "updatedAt": "2026-09-07T13:25:35.861Z"
-    },
     "terraform-engineer": {
       "source": "jeffallan/claude-skills",
       "sourceType": "github",
@@ -441,15 +342,6 @@
       "skillFolderHash": "b64f09a08220f14f48d0cda381c952666cb0e3fe",
       "installedAt": "2026-09-07T13:25:55.091Z",
       "updatedAt": "2026-09-07T13:25:55.091Z"
-    },
-    "coding-standards": {
-      "source": "affaan-m/ecc",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/affaan-m/ecc.git",
-      "skillPath": "skills/coding-standards/SKILL.md",
-      "skillFolderHash": "cba68c74a296bc865d33e6178cb07abc39bb94d6",
-      "installedAt": "2026-09-07T13:26:15.514Z",
-      "updatedAt": "2026-09-07T13:26:15.514Z"
     },
     "devops-automation": {
       "source": "claude-office-skills/skills",
