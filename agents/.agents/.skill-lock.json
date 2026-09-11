@@ -253,15 +253,6 @@
       "installedAt": "2026-09-07T13:14:35.571Z",
       "updatedAt": "2026-09-07T13:14:35.571Z"
     },
-    "browser-automation": {
-      "source": "web-infra-dev/midscene-skills",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/web-infra-dev/midscene-skills.git",
-      "skillPath": "skills/browser/SKILL.md",
-      "skillFolderHash": "392d533c4d4408762a24bae4b50d1d70ebf60e29",
-      "installedAt": "2026-09-07T13:15:22.496Z",
-      "updatedAt": "2026-09-07T13:15:22.496Z"
-    },
     "agent-orchestration": {
       "source": "yonatangross/orchestkit",
       "sourceType": "github",
