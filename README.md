@@ -38,8 +38,8 @@ default handler for a list of file types, which needs the app present.
 ## Symlinks
 
 Configuration is grouped into explicit Stow packages. The link script currently
-manages `agents`, `atuin`, `claude`, `codex`, `gh`, `git`, `mise`, `olink`,
-`opencode`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
+manages `agents`, `atuin`, `claude`, `codex`, `delegate-skills`, `gh`, `git`,
+`mise`, `olink`, `opencode`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
 adding a directory to the repository cannot unexpectedly change `$HOME`.
 
 Preview changes before installing:
@@ -131,6 +131,9 @@ setting in the interface, confirm the path is still linked:
 ```sh
 ls -l ~/.config/zed/settings.json
 ```
+
+The `delegate-skills` package manages `~/.config/delegate-skills/config.json`,
+a read-only configuration file for delegate-fleet lane settings.
 
 The `codex` package manages only `~/.codex/hooks.json`. The hook command uses
 `$HOME` instead of an absolute user path. `~/.codex/config.toml` remains local

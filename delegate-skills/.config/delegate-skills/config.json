@@ -1,0 +1,20 @@
+{
+  "version": "delegate-fleet.v1",
+  "lanes": {
+    "feature": {
+      "implementer": "agy"
+    },
+    "tests": {
+      "implementer": "agy",
+      "model": "gemini-3.8-flash-medium"
+    },
+    "fast": {
+      "implementer": "agy",
+      "model": "gemini-3.8-flash-low"
+    },
+    "complex": {
+      "implementer": "agy",
+      "model": "gemini-3.1-pro-high"
+    }
+  }
+}
