@@ -5,9 +5,22 @@
 ADR 0011 added `codex` as a narrow Stow package managing a single file,
 `~/.codex/hooks.json`, with the hook command's absolute home path replaced by
 `$HOME` so the definition would work on any machine. That substitution has not
-held. The installer that writes the hook definition rewrites the file with the
-expanded path, `/Users/hasansezertasan/.orca/agent-hooks/codex-hook.sh`, in all
-eight hook entries, and writes a `hooks.json.bak` beside it as it does so.
+held. The writer is Orca's managed hook runtime, shipped inside the application
+bundle at `Orca.app/Contents/Resources/relay/<platform>/managed-hook-runtime.js`.
+It rewrites the file with the expanded path,
+`/Users/hasansezertasan/.orca/agent-hooks/codex-hook.sh`, in all eight hook
+entries, and writes a `hooks.json.bak` beside it as it does so.
+
+The runtime cannot emit `$HOME` for this path. It builds the location with
+`path.join(os.homedir(), ".orca", "agent-hooks", <script>)`, resolving the home
+directory in Node at write time, and then wraps the result in single quotes
+when composing the `sh` command. Single quotes suppress shell expansion, so
+even a `$HOME` written by hand could not survive as a variable. The only
+`$HOME` literals in the bundle belong to an unrelated endpoint-discovery
+snippet. A reconciliation path, which logs as `[codex-hook-promotion]`,
+compares the file against the definition it expects and rewrites it when they
+differ — which is why a restored file is undone on the next launch rather than
+at some later point.
 
 Because the managed path is a symlink into this repository, each rewrite lands
 in the working tree and the repository reports a modification. Restoring the
@@ -49,11 +62,12 @@ the expanded path was rejected because a hardcoded home directory in a dotfiles
 repository defeats the purpose of restoring it on another machine, and because
 the repository's own tooling flags such paths as machine-specific.
 
-Reconfiguring the installer is the better fix and is not foreclosed by this
-decision — it simply has not been done. The installer lives outside this
-repository, under `~/.orca/agent-hooks/`, and its behaviour was observed rather
-than read. If it gains a way to emit `$HOME`, the package can be reinstated by
-superseding this record.
+Reconfiguring the writer was rejected on inspection rather than left
+untried. The path is hardcoded by construction in a vendored application
+bundle, with no setting that changes it, so the only way to make the file
+portable would be to patch Orca itself and re-patch it after every update. If a
+future Orca release emits a home-relative path, the package can be reinstated
+by superseding this record.
 
 ### Consequences
 
