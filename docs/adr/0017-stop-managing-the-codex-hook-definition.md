@@ -11,15 +11,17 @@ It rewrites the file with the expanded path,
 `/Users/hasansezertasan/.orca/agent-hooks/codex-hook.sh`, in all eight hook
 entries, and writes a `hooks.json.bak` beside it as it does so.
 
-The runtime cannot emit `$HOME` for this path. It builds the location with
+The runtime never emits `$HOME` for this path. It builds the location with
 `path.join(os.homedir(), ".orca", "agent-hooks", <script>)`, resolving the home
-directory in Node at write time, and then wraps the result in single quotes
-when composing the `sh` command. Single quotes suppress shell expansion, so
-even a `$HOME` written by hand could not survive as a variable. The only
-`$HOME` literals in the bundle belong to an unrelated endpoint-discovery
-snippet. A reconciliation path, which logs as `[codex-hook-promotion]`,
+directory in Node at write time, and then single-quotes the result when
+composing the `sh` command, so nothing it generates can carry a shell variable.
+The only `$HOME` literals in the bundle belong to an unrelated
+endpoint-discovery snippet. The committed `$HOME` form was itself valid — the
+path was assigned inside double quotes, which `/bin/sh` expands, and the hook
+ran — so the obstacle is not the file format but that the form does not
+survive: a reconciliation path, which logs as `[codex-hook-promotion]`,
 compares the file against the definition it expects and rewrites it when they
-differ — which is why a restored file is undone on the next launch rather than
+differ, which is why a restored file is undone on the next launch rather than
 at some later point.
 
 Because the managed path is a symlink into this repository, each rewrite lands
@@ -64,8 +66,9 @@ the repository's own tooling flags such paths as machine-specific.
 
 Reconfiguring the writer was rejected on inspection rather than left
 untried. The path is hardcoded by construction in a vendored application
-bundle, with no setting that changes it, so the only way to make the file
-portable would be to patch Orca itself and re-patch it after every update. If a
+bundle, with no setting that changes it, so the only way to keep a portable
+definition in place would be to patch Orca itself and re-patch it after every
+update. If a
 future Orca release emits a home-relative path, the package can be reinstated
 by superseding this record.
 

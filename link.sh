@@ -59,23 +59,63 @@ preflight_non_agents() {
 # longer told about the package, so it never cleans that link up. Codex writing
 # through the dangling link would recreate the file inside this repository.
 readonly CODEX_HOOK_LINK="${TARGET_DIR}/.codex/hooks.json"
+readonly CODEX_HOOK_FORMER_TARGET="${DOTFILES_DIR}/codex/.codex/hooks.json"
+
+# Resolve '.' and '..' textually. The former target no longer exists, so the
+# link cannot be resolved by cd-ing to it, and a dangling link alone must not
+# be taken as evidence: another tool may own an unrelated one.
+lexical_path() {
+  local input="$1" part
+  local -a parts=() raw=()
+  local old_ifs="${IFS}"
+  IFS='/'
+  # shellcheck disable=SC2206 # splitting on path separators is the point
+  raw=(${input})
+  IFS="${old_ifs}"
+  for part in ${raw[@]+"${raw[@]}"}; do
+    case "${part}" in
+      '' | .) ;;
+      ..)
+        if [ "${#parts[@]}" -gt 0 ]; then
+          parts=(${parts[@]+"${parts[@]:0:$((${#parts[@]} - 1))}"})
+        fi
+        ;;
+      *) parts+=("${part}") ;;
+    esac
+  done
+  local resolved=""
+  for part in ${parts[@]+"${parts[@]}"}; do
+    resolved="${resolved}/${part}"
+  done
+  printf '%s\n' "${resolved:-/}"
+}
+
+codex_hook_link_target() {
+  local value
+  value="$(readlink -- "${CODEX_HOOK_LINK}")"
+  case "${value}" in
+    /*) lexical_path "${value}" ;;
+    *) lexical_path "$(dirname -- "${CODEX_HOOK_LINK}")/${value}" ;;
+  esac
+}
 
 codex_hook_link_is_stale() {
   [ -L "${CODEX_HOOK_LINK}" ] || return 1
-  # The package is gone, so a link into it dangles; that alone identifies it.
-  [ -e "${CODEX_HOOK_LINK}" ] || return 0
-  local resolved
-  resolved="$(
-    cd -- "$(dirname -- "${CODEX_HOOK_LINK}")" || exit 1
-    cd -- "$(dirname -- "$(readlink -- "${CODEX_HOOK_LINK}")")" || exit 1
-    pwd -P
-  )" || return 1
-  [ "${resolved}" = "${DOTFILES_DIR}/codex/.codex" ]
+  [ "$(codex_hook_link_target)" = "$(lexical_path "${CODEX_HOOK_FORMER_TARGET}")" ]
 }
 
 drop_stale_codex_hook_link() {
-  if codex_hook_link_is_stale; then
-    rm -- "${CODEX_HOOK_LINK}"
+  codex_hook_link_is_stale || return 0
+  local target
+  target="$(codex_hook_link_target)"
+  rm -- "${CODEX_HOOK_LINK}"
+  if [ -f "${target}" ]; then
+    # Codex wrote through the stale link before this ran, recreating the file
+    # inside the repository. Keep that content in the home directory, where
+    # Codex expects it, and leave nothing behind in the repository.
+    mv -- "${target}" "${CODEX_HOOK_LINK}"
+    rmdir -- "$(dirname -- "${target}")" 2>/dev/null || :
+    rmdir -- "$(dirname -- "$(dirname -- "${target}")")" 2>/dev/null || :
   fi
 }
 

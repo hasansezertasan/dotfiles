@@ -262,6 +262,53 @@ test_stale_codex_hook_link_is_dropped() {
   rm -rf "${home}"
 }
 
+test_unrelated_dangling_link_survives() {
+  echo "a dangling hook link owned by something else is left alone"
+  local home
+  home="$(make_home)"
+  mkdir -p "${home}/.codex"
+  ln -s "${home}/elsewhere/hooks.json" "${home}/.codex/hooks.json"
+
+  run_link "${home}" install > /dev/null
+
+  if [ ! -L "${home}/.codex/hooks.json" ]; then
+    fail "an unrelated dangling hook link was deleted"
+  fi
+
+  rm -rf "${home}"
+}
+
+test_recreated_hook_file_is_recovered() {
+  echo "a hook file recreated through the stale link is moved back home"
+  local home fixture
+  home="$(make_home)"
+  fixture="$(make_home)"
+  fixture="$(cd -- "${fixture}" && pwd -P)"
+  cp -R "${DOTFILES_DIR}/." "${fixture}"
+
+  # Codex followed the dangling link and wrote the file inside the repository
+  # before link.sh ran.
+  mkdir -p "${fixture}/codex/.codex" "${home}/.codex"
+  printf '%s\n' '{"recreated":true}' > "${fixture}/codex/.codex/hooks.json"
+  ln -s "${fixture}/codex/.codex/hooks.json" "${home}/.codex/hooks.json"
+
+  run_link_from "${fixture}" "${home}" install > /dev/null
+
+  if [ -L "${home}/.codex/hooks.json" ]; then
+    fail "the stale link survived instead of being replaced by the file"
+  elif [ ! -f "${home}/.codex/hooks.json" ]; then
+    fail "the recreated hook file was not moved into the home directory"
+  elif ! grep -q 'recreated' "${home}/.codex/hooks.json"; then
+    fail "the recovered hook file lost its contents"
+  fi
+  if [ -e "${fixture}/codex/.codex/hooks.json" ]; then
+    fail "the recreated hook file was left inside the repository"
+  fi
+
+  rm -rf "${home}"
+  rm -rf "${fixture}"
+}
+
 test_usage_is_rejected() {
   echo "an unknown subcommand exits non-zero"
   local home
@@ -286,6 +333,8 @@ test_existing_skill_lock_is_adopted
 test_conflict_prevents_skill_lock_adoption
 test_conflict_is_refused
 test_stale_codex_hook_link_is_dropped
+test_unrelated_dangling_link_survives
+test_recreated_hook_file_is_recovered
 test_usage_is_rejected
 
 if [ "${failures}" -ne 0 ]; then

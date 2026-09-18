@@ -6,13 +6,14 @@ bundle.
 
 ## Executive conclusion
 
-`~/.codex/hooks.json` cannot hold a home-relative hook path. Orca's managed hook
-runtime builds the path with `os.homedir()` at write time and wraps it in single
-quotes, which suppress shell expansion, so a `$HOME` written by hand is neither
-preserved nor usable. A reconciliation routine rewrites the file whenever its
-contents differ from the definition Orca expects, which is why restoring the
-file does not hold. No setting changes this; the path is hardcoded by
-construction.
+`~/.codex/hooks.json` can hold a home-relative hook path — the definition this
+repository used to commit did, and it ran — but Orca will not write one or keep
+one. Its managed hook runtime builds the path with `os.homedir()` at write time
+and single-quotes it into the generated command, so every definition Orca emits
+is machine-specific. A reconciliation routine then rewrites the file whenever
+its contents differ from the definition it expects, which is why restoring the
+hand-written form does not hold. The limitation is the generator and its
+reconciliation, not the hook format, and no setting changes either.
 
 ## What was observed first
 
@@ -48,7 +49,7 @@ event from an earlier session.
 
 `managed-hook-runtime.js` is shipped per platform and is minified but readable.
 
-## Why `$HOME` cannot survive
+## Why Orca never emits `$HOME`
 
 Two functions in that bundle settle it. The path is resolved in Node:
 
@@ -66,12 +67,22 @@ function I(e, t = {}, n = {}) {
 }
 ```
 
-`os.homedir()` expands the path before it is ever written, and single quotes
-mean that a literal `$HOME` placed in the file by hand would be passed to
-`/bin/sh` as four characters rather than expanded. The bundle contains six
-`$HOME` literals in total; all six belong to an unrelated snippet that
-discovers the agent hook endpoint under `~/Library/Application Support`, not to
-hook path construction.
+`os.homedir()` expands the path before it is ever written, and `Em` single-quotes
+the result, so nothing Orca generates can carry a shell variable. The bundle
+contains six `$HOME` literals in total; all six belong to an unrelated snippet
+that discovers the agent hook endpoint under `~/Library/Application Support`,
+not to hook path construction.
+
+This constrains Orca's output, not the file format. The definition this
+repository committed took a different shape —
+
+```sh
+hook="$HOME/.orca/agent-hooks/codex-hook.sh"; if [ -f "$hook" ] && ...
+```
+
+— where the assignment is double-quoted, so `/bin/sh` expands `$HOME` normally.
+That form is valid and worked for as long as it survived. What it cannot do is
+survive Orca.
 
 ## Why a restore does not hold
 
@@ -84,8 +95,10 @@ differs from the expected definition, so the next run rewrites it.
 ## Consequence for this repository
 
 Managing the file through Stow puts the rewrite inside the working tree, since
-the managed path is a symlink into the repository. The only ways to keep the
-`$HOME` form would be to restore it manually after every rewrite, or to patch
-the vendored application bundle and re-patch it after each Orca update. See
+the managed path is a symlink into the repository. The `$HOME` form is valid
+shell and would keep working if it stayed, so the problem is purely that it
+does not stay: keeping it would mean restoring the file after every rewrite, or
+patching the vendored application bundle and re-patching it after each Orca
+update. See
 [ADR 0017](../adr/0017-stop-managing-the-codex-hook-definition.md) for the
 decision taken.
