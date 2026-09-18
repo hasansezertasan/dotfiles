@@ -49,7 +49,7 @@ Prefer a native manager over a `customManager`.
 When a version is pinned somewhere Renovate cannot read,
 move it into a manifest a native manager already covers
 (`package.json`, `mise.toml`, …) rather than writing regex to scan the ad-hoc file.
-Native managers cover every entry in a manifest automatically;
+Native managers cover every supported entry in a manifest automatically;
 a regex covers only the stanzas someone remembered to write,
 so it silently stops covering new dependencies.
 
