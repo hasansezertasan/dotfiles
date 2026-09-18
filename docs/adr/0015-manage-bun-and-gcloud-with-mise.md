@@ -50,3 +50,7 @@ than portable configuration.
   packaging difference is inherited from mise's backend.
 * Bad, because exact pins do not move on their own; each upgrade is a manual
   edit until this repository adopts an automated updater.
+
+## Related Research
+
+* [Symlink safety of the candidate application configurations](../research/0007-symlink-safety-of-cli-tool-config.md)
