@@ -237,6 +237,31 @@ test_conflict_is_refused() {
   rm -rf "${home}"
 }
 
+test_stale_codex_hook_link_is_dropped() {
+  echo "a codex hook link left by the removed package is dropped"
+  local home
+  home="$(make_home)"
+  mkdir -p "${home}/.codex"
+  # Exactly what an earlier revision left behind: a link into the deleted
+  # codex package, now dangling.
+  ln -s "${DOTFILES_DIR}/codex/.codex/hooks.json" "${home}/.codex/hooks.json"
+
+  run_link "${home}" install > /dev/null
+
+  if [ -e "${home}/.codex/hooks.json" ] || [ -L "${home}/.codex/hooks.json" ]; then
+    fail "the stale codex hook link survived install"
+  fi
+
+  # A real hook file is Codex's own and must be left alone.
+  printf '%s\n' '{"hooks":{}}' > "${home}/.codex/hooks.json"
+  run_link "${home}" restow > /dev/null
+  if [ ! -f "${home}/.codex/hooks.json" ]; then
+    fail "restow removed a real Codex hook file"
+  fi
+
+  rm -rf "${home}"
+}
+
 test_usage_is_rejected() {
   echo "an unknown subcommand exits non-zero"
   local home
@@ -260,6 +285,7 @@ test_uninstall_removes_every_link
 test_existing_skill_lock_is_adopted
 test_conflict_prevents_skill_lock_adoption
 test_conflict_is_refused
+test_stale_codex_hook_link_is_dropped
 test_usage_is_rejected
 
 if [ "${failures}" -ne 0 ]; then

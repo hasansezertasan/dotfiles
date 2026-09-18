@@ -85,5 +85,6 @@ by superseding this record.
 
 ## Related Research
 
+* [How Orca rewrites the Codex hook definition](../research/0013-orca-codex-hook-rewrite.md)
 * [Boundaries for additional Stow packages](../research/0009-additional-stow-package-boundaries.md)
 * [Symlink safety of the candidate application configurations](../research/0007-symlink-safety-of-cli-tool-config.md)
