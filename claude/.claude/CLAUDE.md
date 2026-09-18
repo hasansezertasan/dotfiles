@@ -42,3 +42,18 @@ Include the ticket when one exists: `feature/issue-123-add-login`.
 Same format as the commit message,
 so the [Conventional Pull Request](https://github.com/marketplace/actions/conventional-pull-request)
 action passes.
+
+### Renovate
+
+Prefer a native manager over a `customManager`.
+When a version is pinned somewhere Renovate cannot read,
+move it into a manifest a native manager already covers
+(`package.json`, `mise.toml`, …) rather than writing regex to scan the ad-hoc file.
+Native managers cover every entry in a manifest automatically;
+a regex covers only the stanzas someone remembered to write,
+so it silently stops covering new dependencies.
+
+A regex manager that has to keep two hand-written copies of a version in sync
+is a sign the duplication is the real bug.
+When one is genuinely unavoidable,
+its `description` must say why no native manager fits.
