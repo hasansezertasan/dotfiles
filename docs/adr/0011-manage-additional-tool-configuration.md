@@ -28,7 +28,9 @@ documented automatic discovery for application-installed plugins. Zed manages
 only its settings file.
 
 Codex manages only `hooks.json`, with its absolute home path replaced by
-`$HOME`. `config.toml` is intentionally not managed because durable settings
+`$HOME`. (The Codex part of this decision is superseded by
+[ADR 0017](0017-stop-managing-the-codex-hook-definition.md): the installer
+rewrites the expanded path back into the file, so the package was removed.) `config.toml` is intentionally not managed because durable settings
 and generated machine state occupy the same file. The Codex ignore allowlist
 prevents other `.codex` content from being staged accidentally.
 

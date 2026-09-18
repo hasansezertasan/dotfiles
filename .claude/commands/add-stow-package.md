@@ -145,7 +145,7 @@ files, but the tool may regenerate sensitive siblings through the symlink:
 ```
 
 Pattern: deny everything in the directory, then allow back only the managed files.
-See existing patterns in `.gitignore` for `ssh/`, `codex/`, `zed/`, `opencode/`.
+See existing patterns in `.gitignore` for `ssh/`, `zed/`, `opencode/`.
 
 Skip this step if the source directory in `$HOME` contains only the managed
 files with no sensitive siblings.

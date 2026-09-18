@@ -12,7 +12,6 @@ readonly DOTFILES_DIR
 readonly -a EXPECTED_LINKS=(
   .agents/.skill-lock.json
   .claude/CLAUDE.md
-  .codex/hooks.json
   .config/atuin/config.toml
   .config/delegate-skills/config.json
   .config/gh/config.yml
@@ -33,7 +32,6 @@ readonly -a EXPECTED_LINKS=(
 readonly -a EXPECTED_DIRS=(
   .agents
   .claude
-  .codex
   .config
   .config/atuin
   .config/delegate-skills
