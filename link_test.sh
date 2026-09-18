@@ -14,6 +14,7 @@ readonly -a EXPECTED_LINKS=(
   .claude/CLAUDE.md
   .codex/hooks.json
   .config/atuin/config.toml
+  .config/delegate-skills/config.json
   .config/gh/config.yml
   .config/mise/config.toml
   .config/olink/pins.json
@@ -35,6 +36,7 @@ readonly -a EXPECTED_DIRS=(
   .codex
   .config
   .config/atuin
+  .config/delegate-skills
   .config/gh
   .config/mise
   .config/olink
