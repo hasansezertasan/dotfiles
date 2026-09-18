@@ -12,11 +12,6 @@ gh/.config/gh/hosts.yml
 ssh/.ssh/*
 !ssh/.ssh/config
 
-# Codex keeps credentials, histories, databases, sessions, caches, and mutable
-# config.toml state beside the portable hook definition.
-codex/.codex/*
-!codex/.codex/hooks.json
-
 # OpenCode installs dependencies and the Open Island integration locally.
 opencode/.config/opencode/node_modules/
 opencode/.config/opencode/package-lock.json
