@@ -4,11 +4,16 @@ Research snapshot: 2026-09-11 on macOS 26.6.
 
 ## Executive conclusion
 
-Seventeen candidate locations were scanned. Zero tools are ready to add as Stow
-packages. One tool (bd) has portable config but lacks a config-redirect
-mechanism, making symlink safety unverifiable without in-place testing. The
-remaining candidates contain credentials, are externally version-controlled,
-or hold only generated state.
+Twenty-eight tools are accounted for below: nine had configuration on disk and
+were examined in detail, and nineteen Brewfile tools had none. Zero are ready
+to add as Stow packages.
+
+One tool (bd) has portable config but lacks a config-redirect mechanism, making
+symlink safety unverifiable without in-place testing. Each of the other eight
+examined locations is excluded for a reason of its own: credentials (gcloud,
+codexbar, VS Code), an external Git repository (nvim), generated state (herdr),
+a cache directory (cobo), databases with no configuration files (Raycast), and
+an empty placeholder file (Ghostty).
 
 ## Inventory method
 
