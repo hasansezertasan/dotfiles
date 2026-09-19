@@ -5,12 +5,13 @@ verification pass on 2026-09-19.
 
 ## Executive conclusion
 
-One candidate, bd, meets the criteria for a Stow package: 111 bytes of portable
-configuration, no credentials, and it writes through a symlink. The 2026-09-11
-pass left that last point unverified; the in-place test below settles it.
-Whether to add the package is a separate decision.
+No candidate is ready to add. bd met every technical criterion — 111 bytes of
+portable configuration, no credentials, and verified to write through a symlink
+— but it is withdrawn: the tool is no longer in use as of 2026-09-19, so there
+is no configuration worth restoring on another machine. The verification is
+kept below as evidence, should bd ever come back.
 
-Nothing else qualifies. Twenty-seven tools were examined on 2026-09-11 — nine
+Nothing else qualifies either. Twenty-seven tools were examined on 2026-09-11 — nine
 with configuration on disk and eighteen Brewfile tools with none — and each of
 the eight non-viable examined locations is excluded for a reason of its own:
 credentials (gcloud, codexbar, VS Code), an external Git repository (nvim),
@@ -51,7 +52,7 @@ already outside the scope of this scan.
 | nvim | `~/.config/nvim/` | 220K | External git repo | No |
 | gcloud | `~/.config/gcloud/` | 93M | Credentials | No |
 | herdr | `~/.config/herdr/` | 18K | Generated state | No |
-| bd | `~/.config/bd/config.yaml` | 111B | Portable config | Yes — verified 2026-09-19 |
+| bd | `~/.config/bd/config.yaml` | 111B | Portable config | No — tool no longer used |
 | VS Code | `~/Library/.../Code/User/` | — | Mixed (credentials) | No |
 | Ghostty | `~/Library/.../com.mitchellh.ghostty/` | — | Empty placeholder | No |
 | Raycast | `~/Library/.../com.raycast.macos/` | — | Databases only | No |
@@ -83,7 +84,10 @@ Contains `access_tokens.db`, `credentials.db`, and
 `application_default_credentials.json`. Also contains a Python virtual
 environment (93 MB). None of this is portable or safe to track.
 
-### bd — verified symlink-safe in place
+### bd — verified symlink-safe, then withdrawn
+
+bd is no longer in use as of 2026-09-19, so it is not a candidate regardless of
+the result below. The verification stands on its own and is kept for reference.
 
 `bd config set` does not respect `XDG_CONFIG_HOME` or any redirect variable,
 and always writes to `~/.config/bd/config.yaml`. That rules out the preferred
@@ -101,7 +105,9 @@ Tested 2026-09-19 with bd 1.2.2 (Homebrew). The real config was moved outside
 * `bd metrics off` restored the original value, and the original file was put
   back byte-identical with its `600` mode intact.
 
-bd therefore satisfies the criterion ADR 0004 set and ADR 0009 applied. The
+bd therefore satisfies the criterion ADR 0004 set and ADR 0009 applied, which
+settles the question the 2026-09-11 pass left open. It is not being added, for
+the reason given at the top of this section. The
 config file (111 bytes) contains only metrics settings with no credentials. As
 recorded on 2026-09-11 it read:
 
@@ -194,17 +200,20 @@ settings with window state.
 
 | Tool | Redirect variable | Write command | Status |
 | --- | --- | --- | --- |
-| bd | None found | `bd metrics on` / `off` | Verified in place — writes through the link |
+| bd | None found | `bd metrics on` / `off` | Verified in place — writes through the link, but withdrawn |
 
-bd is the only candidate with portable configuration, and it writes through a
+bd was the only candidate with portable configuration, and it writes through a
 symlink. The missing redirect variable means the check has to be run against
-the real file rather than a scratch copy.
+the real file rather than a scratch copy. The tool is no longer used, so the
+result is recorded rather than acted on.
 
 ## Next steps
 
-**Ready to add:**
-- `bd` — one managed file, `~/.config/bd/config.yaml`, verified symlink-safe on
-  2026-09-19. Adding the package is a decision for an ADR, not for this note.
+**Ready to add:** None.
+
+**Withdrawn:**
+- `bd` — technically viable, one managed file verified symlink-safe on
+  2026-09-19, but the tool is no longer used. Reconsider only if it returns.
 
 **Needs credential cleanup before consideration:**
 - VS Code — remove or externalize hardcoded API keys and passwords from
