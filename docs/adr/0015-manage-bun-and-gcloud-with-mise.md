@@ -54,3 +54,4 @@ than portable configuration.
 ## Related Research
 
 * [Symlink safety of the candidate application configurations](../research/0007-symlink-safety-of-cli-tool-config.md)
+* [Stow candidate scan, September 2026](../research/0012-stow-candidate-scan-2026-09.md)
