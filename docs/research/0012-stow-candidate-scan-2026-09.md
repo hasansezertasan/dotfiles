@@ -10,8 +10,8 @@ configuration, no credentials, and it writes through a symlink. The 2026-09-11
 pass left that last point unverified; the in-place test below settles it.
 Whether to add the package is a separate decision.
 
-Nothing else qualifies. Twenty-eight tools were examined on 2026-09-11 — nine
-with configuration on disk and nineteen Brewfile tools with none — and each of
+Nothing else qualifies. Twenty-seven tools were examined on 2026-09-11 — nine
+with configuration on disk and eighteen Brewfile tools with none — and each of
 the eight non-viable examined locations is excluded for a reason of its own:
 credentials (gcloud, codexbar, VS Code), an external Git repository (nvim),
 generated state (herdr), a cache directory (cobo), databases with no
@@ -19,7 +19,7 @@ configuration files (Raycast), and an empty placeholder file (Ghostty).
 
 That first pass did not reach every Brewfile entry. The supplementary pass
 records the remaining eighteen, so all 47 declarations now have an outcome:
-six are already-managed packages, twenty-three appear in the tables below, and
+seven are already-managed packages, twenty-two appear in the tables below, and
 eighteen are covered under Brewfile coverage.
 
 ## Inventory method
@@ -57,8 +57,12 @@ git, mise, olink, opencode, ssh, zed, zsh.
 
 The following Brewfile tools have no user configuration on disk:
 
-btop, dockutil, duti, fzf, jq, mole, ripgrep, shellcheck, skills, starship,
+btop, dockutil, duti, fzf, jq, mole, ripgrep, shellcheck, starship,
 tailscale, tmux, x-cmd, yazi, zoxide, hwid, nur, ocom, peta.
+
+`skills` is not among them. The Skills CLI owns `~/.agents/.skill-lock.json`,
+which the `agents` package already manages — see ADR 0016 — so it belongs with
+the already-managed tools rather than the unconfigured ones.
 
 ## Tool-specific notes
 
@@ -93,7 +97,8 @@ Tested 2026-09-19 with bd 1.2.2 (Homebrew). The real config was moved outside
   back byte-identical with its `600` mode intact.
 
 bd therefore satisfies the criterion ADR 0004 set and ADR 0009 applied. The
-config file (111 bytes) contains only metrics settings with no credentials:
+config file (111 bytes) contains only metrics settings with no credentials. As
+recorded on 2026-09-11 it read:
 
 ```yaml
 metrics:
@@ -101,6 +106,11 @@ metrics:
     endpoint: https://gastownhall-eventsapi.com/mp/collect
     notice_shown: true
 ```
+
+By 2026-09-19 `metrics.disabled` was `true`, set in the ordinary course of
+using the tool, and that is the value the test started from: `bd metrics on`
+moved it to `false` and `bd metrics off` returned it to `true`. Only that field
+differs between the two snapshots.
 
 A `BD_CONFIG_DIR` or similar mechanism would make the behaviour re-testable in
 a scratch directory, which is the only thing its absence now costs.
@@ -131,8 +141,8 @@ but is empty (0 bytes). The standard config location is
 
 ## Brewfile coverage
 
-Supplementary pass, 2026-09-19. The 2026-09-11 tables cover twenty-three of the
-forty-one Brewfile entries that are not already managed. These are the other
+Supplementary pass, 2026-09-19. The 2026-09-11 tables cover twenty-two of the
+forty Brewfile entries that are not already managed. These are the other
 eighteen. This pass records only whether configuration exists and what kind it
 is; no symlink-safety testing was done, because nothing here reached the point
 of needing it.
@@ -145,7 +155,7 @@ of needing it.
 | google-chrome | `com.google.Chrome.plist`, `~/Library/.../Google/Chrome` | App-managed profile | No |
 | google-drive | `com.google.drivefs*.plist` | Preferences plist | No |
 | openvpn-connect | `~/.openvpn/*.ovpn`, `~/Library/.../OpenVPN Connect` | Credentials (VPN profile) | No |
-| orbstack | `~/.orbstack/` (552K) | Mixed: `config/` beside `bin/`, `log/`, install id | No |
+| orbstack | `~/.orbstack/config/docker.json` (4B) | Empty placeholder beside `bin/`, `log/`, install id | No |
 | slack | `~/Library/.../Slack`, `com.tinyspeck.slackmacgap.plist` | App-managed state | No |
 | spotify | `~/Library/.../Spotify`, `com.spotify.client.plist` | App-managed state | No |
 | stats | `~/Library/.../Stats`, `eu.exelban.Stats.plist` | Preferences plist | No |
@@ -158,9 +168,16 @@ of needing it.
 | meta-package-manager | none (`~/.config/mpm` absent) | No configuration on disk | No |
 | stow | none (`~/.stowrc` absent) | No configuration on disk | No |
 
-Two entries are worth a second look if the criteria ever loosen. `~/.orbstack`
-has a `config/` subdirectory, but it sits beside binaries, logs, and an install
-id, so the package boundary would have to be narrower than the directory.
+OrbStack was the one entry with a configuration subtree worth opening, so it was
+inventoried per file rather than rejected by directory. `~/.orbstack/config/`
+holds a single file, `docker.json`, of four bytes — `{}`, an empty object, with
+no credential patterns. A narrow package could manage that one file the way the
+`olink` package manages its pins file, but there is nothing in it to manage yet.
+The surrounding `bin/`, `k8s/`, `log/` and `.installid` are generated state and
+would stay outside any such package. Revisit if Docker settings are ever written
+there; symlink-safety testing was not attempted, because an empty file gives
+nothing to verify a write against.
+
 `~/.openvpn` holds a `.ovpn` profile, which carries embedded credentials and is
 excluded for the same reason as gcloud.
 
@@ -200,5 +217,5 @@ the real file rather than a scratch copy.
 - Raycast — database-driven, no config files
 
 **No config to manage:**
-- btop, dockutil, duti, fzf, jq, mole, ripgrep, shellcheck, skills, starship,
+- btop, dockutil, duti, fzf, jq, mole, ripgrep, shellcheck, starship,
   tailscale, tmux, x-cmd, yazi, zoxide, hwid, nur, ocom, peta
