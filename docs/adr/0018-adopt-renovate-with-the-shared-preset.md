@@ -46,23 +46,14 @@ ADR 0014's rule intact by construction: the native managers arrive configured,
 and the only regex manager in the preset carries the `description` explaining
 why no native manager fits it.
 
-A local dry-run (`renovate --platform=local --dry-run=extract`) confirms what
-the native managers reach in this repository, rather than leaving it to
-assumption: five package files and seventeen dependency instances.
-
-| Package file | Manager | Dependencies |
-| --- | --- | --- |
-| `.github/workflows/ci.yml` | github-actions | `actions/checkout`, `ubuntu` runners |
-| `.github/workflows/check-pr-title.yml` | github-actions | `amannn/action-semantic-pull-request`, `marocchino/sticky-pull-request-comment` |
-| `.github/workflows/check-branch-name.yml` | github-actions | `marocchino/sticky-pull-request-comment` |
-| `mise/.config/mise/config.toml` | mise | `bun`, `gcloud`, `uv` |
-| `opencode/.config/opencode/package.json` | npm | `@opencode-ai/plugin` |
-
-The mise entry is the one worth checking rather than assuming: the file sits at
-a Stow package path, `mise/.config/mise/config.toml`, not at a conventional
-repository root location, and the mise manager still matches it. No
-`customManager` is needed for anything here, which is the outcome ADR 0014 asks
-for.
+A local dry-run confirms what the native managers reach here rather than
+leaving it to assumption: five package files and seventeen dependency
+instances, across the three workflows, the mise pins, and the OpenCode plugin
+manifest. The result worth checking was mise's: the file sits at a Stow package
+path, `mise/.config/mise/config.toml`, and the manager matches it regardless.
+No `customManager` is needed for anything in this repository, which is the
+outcome ADR 0014 asks for. The method, the full coverage table, and the three
+manifest-shaped files that no manager reaches are recorded in research 0015.
 
 Two existing decisions line up with this without further work. Semantic commit
 messages satisfy the Conventional Commits gate on pull request titles, and
@@ -84,3 +75,7 @@ Renovate's pull requests pass both checks that ADR 0012 introduced.
 * Bad, because Renovate now proposes changes inside managed dotfiles:
   `opencode/.config/opencode/package.json` is symlinked into `$HOME`, so a
   merged update changes live configuration, not just repository content.
+
+## Related Research
+
+* [What Renovate's native managers reach in this repository](../research/0015-renovate-manager-coverage.md)
