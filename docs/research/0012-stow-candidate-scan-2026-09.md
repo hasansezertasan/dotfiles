@@ -46,7 +46,7 @@ git, mise, olink, opencode, ssh, zed, zsh.
 | nvim | `~/.config/nvim/` | 220K | External git repo | No |
 | gcloud | `~/.config/gcloud/` | 93M | Credentials | No |
 | herdr | `~/.config/herdr/` | 18K | Generated state | No |
-| bd | `~/.config/bd/config.yaml` | 111B | Portable config | Unknown |
+| bd | `~/.config/bd/config.yaml` | 111B | Portable config | Yes — verified 2026-09-19 |
 | VS Code | `~/Library/.../Code/User/` | — | Mixed (credentials) | No |
 | Ghostty | `~/Library/.../com.mitchellh.ghostty/` | — | Empty placeholder | No |
 | Raycast | `~/Library/.../com.raycast.macos/` | — | Databases only | No |
