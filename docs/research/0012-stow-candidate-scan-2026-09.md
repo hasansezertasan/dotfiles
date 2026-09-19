@@ -1,19 +1,26 @@
 # Stow candidate scan
 
-Research snapshot: 2026-09-11 on macOS 26.6.
+Research snapshot: 2026-09-11 on macOS 26.6, with a supplementary coverage and
+verification pass on 2026-09-19.
 
 ## Executive conclusion
 
-Twenty-eight tools are accounted for below: nine had configuration on disk and
-were examined in detail, and nineteen Brewfile tools had none. Zero are ready
-to add as Stow packages.
+One candidate, bd, meets the criteria for a Stow package: 111 bytes of portable
+configuration, no credentials, and it writes through a symlink. The 2026-09-11
+pass left that last point unverified; the in-place test below settles it.
+Whether to add the package is a separate decision.
 
-One tool (bd) has portable config but lacks a config-redirect mechanism, making
-symlink safety unverifiable without in-place testing. Each of the other eight
-examined locations is excluded for a reason of its own: credentials (gcloud,
-codexbar, VS Code), an external Git repository (nvim), generated state (herdr),
-a cache directory (cobo), databases with no configuration files (Raycast), and
-an empty placeholder file (Ghostty).
+Nothing else qualifies. Twenty-eight tools were examined on 2026-09-11 — nine
+with configuration on disk and nineteen Brewfile tools with none — and each of
+the eight non-viable examined locations is excluded for a reason of its own:
+credentials (gcloud, codexbar, VS Code), an external Git repository (nvim),
+generated state (herdr), a cache directory (cobo), databases with no
+configuration files (Raycast), and an empty placeholder file (Ghostty).
+
+That first pass did not reach every Brewfile entry. The supplementary pass
+records the remaining eighteen, so all 47 declarations now have an outcome:
+six are already-managed packages, twenty-three appear in the tables below, and
+eighteen are covered under Brewfile coverage.
 
 ## Inventory method
 
@@ -67,14 +74,26 @@ Contains `access_tokens.db`, `credentials.db`, and
 `application_default_credentials.json`. Also contains a Python virtual
 environment (93 MB). None of this is portable or safe to track.
 
-### bd — promising but unverifiable
+### bd — verified symlink-safe in place
 
-`bd config set` does not respect `XDG_CONFIG_HOME` or any redirect variable.
-The command always writes to `~/.config/bd/config.yaml` regardless of
-environment. Without a redirect mechanism, symlink safety cannot be tested in
-a scratch directory. An in-place test on the real config would be required.
+`bd config set` does not respect `XDG_CONFIG_HOME` or any redirect variable,
+and always writes to `~/.config/bd/config.yaml`. That rules out the preferred
+scratch-directory test, but not testing as such: the file is 111 bytes and the
+write is driven by `bd metrics on|off`, so it can be backed up, exercised, and
+restored.
 
-The config file (111 bytes) contains only metrics settings with no credentials:
+Tested 2026-09-19 with bd 1.2.2 (Homebrew). The real config was moved outside
+`~/.config/bd`, a symlink left in its place, and `bd metrics on` run:
+
+* The symlink survived the write — `~/.config/bd/config.yaml` was still a link
+  afterwards, not a file bd had replaced.
+* `metrics.disabled` changed from `true` to `false` in the target file outside
+  the configuration directory, so the write followed the link.
+* `bd metrics off` restored the original value, and the original file was put
+  back byte-identical with its `600` mode intact.
+
+bd therefore satisfies the criterion ADR 0004 set and ADR 0009 applied. The
+config file (111 bytes) contains only metrics settings with no credentials:
 
 ```yaml
 metrics:
@@ -83,8 +102,8 @@ metrics:
     notice_shown: true
 ```
 
-If bd adds a `BD_CONFIG_DIR` or similar mechanism, this would be a viable
-package with one managed file.
+A `BD_CONFIG_DIR` or similar mechanism would make the behaviour re-testable in
+a scratch directory, which is the only thing its absence now costs.
 
 ### VS Code — credentials in settings
 
@@ -110,28 +129,68 @@ client secrets, and GitHub personal access tokens for multiple providers
 but is empty (0 bytes). The standard config location is
 `~/.config/ghostty/config` which does not exist. No portable config to manage.
 
+## Brewfile coverage
+
+Supplementary pass, 2026-09-19. The 2026-09-11 tables cover twenty-three of the
+forty-one Brewfile entries that are not already managed. These are the other
+eighteen. This pass records only whether configuration exists and what kind it
+is; no symlink-safety testing was done, because nothing here reached the point
+of needing it.
+
+| Entry | Configuration found | Classification | Viable |
+| --- | --- | --- | --- |
+| chatgpt | `~/Library/Application Support/com.openai.chat` | App-managed state | No |
+| cloudflare-warp | `com.cloudflare.1dot1dot1dot1.macos.plist` | Preferences plist | No |
+| dbeaver-community | `org.jkiss.dbeaver.core.product.plist` | Preferences plist | No |
+| google-chrome | `com.google.Chrome.plist`, `~/Library/.../Google/Chrome` | App-managed profile | No |
+| google-drive | `com.google.drivefs*.plist` | Preferences plist | No |
+| openvpn-connect | `~/.openvpn/*.ovpn`, `~/Library/.../OpenVPN Connect` | Credentials (VPN profile) | No |
+| orbstack | `~/.orbstack/` (552K) | Mixed: `config/` beside `bin/`, `log/`, install id | No |
+| slack | `~/Library/.../Slack`, `com.tinyspeck.slackmacgap.plist` | App-managed state | No |
+| spotify | `~/Library/.../Spotify`, `com.spotify.client.plist` | App-managed state | No |
+| stats | `~/Library/.../Stats`, `eu.exelban.Stats.plist` | Preferences plist | No |
+| tailscale-app | `io.tailscale.ipn.macsys.plist` | Preferences plist | No |
+| discord | none | No configuration on disk | No |
+| iina | none | No configuration on disk | No |
+| notunes | none | No configuration on disk | No |
+| whatsapp | none | No configuration on disk | No |
+| zen | none | No configuration on disk | No |
+| meta-package-manager | none (`~/.config/mpm` absent) | No configuration on disk | No |
+| stow | none (`~/.stowrc` absent) | No configuration on disk | No |
+
+Two entries are worth a second look if the criteria ever loosen. `~/.orbstack`
+has a `config/` subdirectory, but it sits beside binaries, logs, and an install
+id, so the package boundary would have to be narrower than the directory.
+`~/.openvpn` holds a `.ovpn` profile, which carries embedded credentials and is
+excluded for the same reason as gcloud.
+
+Preferences plists are excluded throughout: they are binary, rewritten wholesale
+by `cfprefsd` rather than by an application writing a file, and they mix durable
+settings with window state.
+
 ## Symlink safety
 
 | Tool | Redirect variable | Write command | Status |
 | --- | --- | --- | --- |
-| bd | None found | `bd config set` | Unknown — no redirect to test safely |
+| bd | None found | `bd metrics on` / `off` | Verified in place — writes through the link |
 
-No candidates could be verified as symlink-safe. The only tool with portable
-config (bd) does not support configuration redirection.
+bd is the only candidate with portable configuration, and it writes through a
+symlink. The missing redirect variable means the check has to be run against
+the real file rather than a scratch copy.
 
 ## Next steps
 
-**Ready to add:** None.
-
-**Needs upstream change:**
-- `bd` — needs a `BD_CONFIG_DIR` environment variable or similar mechanism
-  before symlink safety can be verified.
+**Ready to add:**
+- `bd` — one managed file, `~/.config/bd/config.yaml`, verified symlink-safe on
+  2026-09-19. Adding the package is a decision for an ADR, not for this note.
 
 **Needs credential cleanup before consideration:**
 - VS Code — remove or externalize hardcoded API keys and passwords from
   `settings.json`, then reassess.
 
 **Not viable:**
+- the eighteen Brewfile entries under Brewfile coverage — app-managed state,
+  preferences plists, credentials, or no configuration at all
 - nvim — already has its own git repository
 - gcloud — credential store, not config
 - herdr — only logs and session state
