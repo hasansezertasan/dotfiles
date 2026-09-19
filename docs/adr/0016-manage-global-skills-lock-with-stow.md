@@ -41,4 +41,4 @@ continue to reject conflicts rather than adopting unrelated local configuration.
 
 ## Related Research
 
-* [Stow boundary for the global Skills CLI manifest](../research/0010-agents-skill-lock-stow-package.md)
+* [Stow boundary for the global Skills CLI manifest](../research/0014-agents-skill-lock-stow-package.md)
