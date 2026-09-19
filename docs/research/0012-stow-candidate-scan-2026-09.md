@@ -37,6 +37,11 @@ for `token`, `api_key`, `secret`, `password`, `oauth`, and key file extensions.
 Already-managed packages (from `link.sh`): agents, atuin, claude, codex, gh,
 git, mise, olink, opencode, ssh, zed, zsh.
 
+That list is the 2026-09-11 state. Since then `delegate-skills` has been added
+and `codex` removed — see ADR 0017 — but neither changes any finding here:
+`delegate-skills` is not a Brewfile entry, and Codex's hook definition was
+already outside the scope of this scan.
+
 ## Findings by tool
 
 ### Tools with configuration examined
