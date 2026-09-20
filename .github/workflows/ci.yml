@@ -12,7 +12,7 @@ jobs:
   shellcheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       # ShellCheck is preinstalled on GitHub-hosted runners. The pathspec
       # matches tracked scripts at any depth, so nested ones are covered
       # without editing this workflow.
@@ -21,7 +21,7 @@ jobs:
   link:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends stow
       # link_test.sh runs the real link.sh against a scratch HOME, so it never
       # touches the runner's home directory.
@@ -30,7 +30,7 @@ jobs:
   zsh-syntax:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zsh
       # ShellCheck does not support the Zsh dialect, so the Zsh package gets a
       # parse-only check instead. `zsh -n` reads one script and treats any
