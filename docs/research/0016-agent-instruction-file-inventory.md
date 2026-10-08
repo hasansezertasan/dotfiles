@@ -39,3 +39,8 @@ Therefore the global file belongs at `claude/.claude/rules/AGENTS.md`, keeping
 the requested filename and automatic user-level loading without a `CLAUDE.md`.
 The existing Stow behavioural suite checks the installed rule symlink and
 that its shared directory is a real directory.
+
+A follow-up review identified that project-specific overrides must continue
+to work in repositories using either supported instruction filename.
+The global conventions therefore defer to the project's own instructions
+without requiring a particular filename.

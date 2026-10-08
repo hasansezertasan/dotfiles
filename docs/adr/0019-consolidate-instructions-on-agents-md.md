@@ -25,7 +25,7 @@ rules under `~/.claude/rules/` load for every project.
 
 Chosen option: "Standardize on AGENTS.md".
 Rename `claude/.claude/CLAUDE.md` to `claude/.claude/rules/AGENTS.md`, preserving its
-rules and updating the project-override reference.
+rules and making the project-override exemption filename-neutral.
 The rule has no `paths` frontmatter, so it loads for every project.
 This avoids the user-level discovery regression identified during PR review
 while fulfilling the request to remove `CLAUDE.md`.
