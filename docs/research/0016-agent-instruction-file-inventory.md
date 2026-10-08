@@ -22,5 +22,20 @@ on `AGENTS.md`.
 
 Local inspection with `git ls-files`, reference search, and reads of the instruction
 file, PR skill, `link.sh`, and `link_test.sh`.
-The requested switch assumes the user's Claude Code installation supports
-`AGENTS.md`; runtime discovery was not tested here.
+
+## Review Follow-up: Global Instruction Discovery
+
+Both PR reviewers identified that renaming the global file directly to
+`~/.claude/AGENTS.md` would lose automatic user-level loading.
+The [official memory documentation](https://code.claude.com/docs/en/memory#agents-md),
+checked on 2026-10-08, confirms that `AGENTS.md` discovery covers project paths
+and that `~/.claude/CLAUDE.md` is the user-level instruction entry point.
+
+The same documentation's
+[user-level rules section](https://code.claude.com/docs/en/memory#user-level-rules)
+states that Markdown rules in `~/.claude/rules/` apply to every project.
+Rules without `paths` frontmatter load unconditionally.
+Therefore the global file belongs at `claude/.claude/rules/AGENTS.md`, keeping
+the requested filename and automatic user-level loading without a `CLAUDE.md`.
+The existing Stow behavioural suite checks the installed rule symlink and
+that its shared directory is a real directory.

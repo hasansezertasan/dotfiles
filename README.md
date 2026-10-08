@@ -102,7 +102,9 @@ which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Additional tool configuration
 
-The `claude` package links the global instructions as `~/.claude/AGENTS.md`.
+The `claude` package links the global instructions as `~/.claude/rules/AGENTS.md`.
+Claude Code loads user-level rules for every project; its automatic `AGENTS.md`
+discovery applies to project paths, not `~/.claude/AGENTS.md`.
 Project instructions use `AGENTS.md` too. When upgrading from the former
 `CLAUDE.md` path, remove the old `~/.claude/CLAUDE.md` symlink after confirming
 it points into this repository, then run `./link.sh restow`.
