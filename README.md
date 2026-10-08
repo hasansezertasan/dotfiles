@@ -102,6 +102,11 @@ which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Additional tool configuration
 
+The `claude` package links the global instructions as `~/.claude/AGENTS.md`.
+Project instructions use `AGENTS.md` too. When upgrading from the former
+`CLAUDE.md` path, remove the old `~/.claude/CLAUDE.md` symlink after confirming
+it points into this repository, then run `./link.sh restow`.
+
 The `agents` package manages only `~/.agents/.skill-lock.json`, the portable
 manifest used by the `skills` CLI to restore globally installed skills. The
 generated `~/.agents/skills/` content remains local and ignored. The CLI writes

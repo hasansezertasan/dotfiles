@@ -64,15 +64,15 @@ Render the decision:
 - **PR body** — a line or two of plain prose. The title carries the meaning; skip
   ceremony. Add `Closes #123` when an issue is genuinely closed by this change.
 
-Worked example, from a diff adding `claude/.claude/CLAUDE.md` and a stow package:
+Worked example, from a diff adding `claude/.claude/AGENTS.md` and a stow package:
 
 ```
-type feat, scope claude, effect "add global CLAUDE.md as a stow package"
+type feat, scope claude, effect "add global AGENTS.md as a stow package"
 
-branch  feature/add-global-claude-md
-commit  feat(claude): add global CLAUDE.md as a stow package
-title   feat(claude): add global CLAUDE.md as a stow package
-body    Links ~/.claude/CLAUDE.md back into the dotfiles repo via stow.
+branch  feature/add-global-agents-md
+commit  feat(claude): add global AGENTS.md as a stow package
+title   feat(claude): add global AGENTS.md as a stow package
+body    Links ~/.claude/AGENTS.md back into the dotfiles repo via stow.
 ```
 
 ### The branch description names the change, not who or what made it
@@ -111,7 +111,7 @@ branch that was not yours.
 ## 4. Leave the history clean
 
 The pre-flight lists every unpushed commit and flags any that are non-conventional or
-carry AI attribution (the machine-wide policy in `~/.claude/CLAUDE.md` — no
+carry AI attribution (the machine-wide policy in `~/.claude/AGENTS.md` — no
 `Co-Authored-By` naming an agent, no "Generated with" footers, nothing hinting the work
 was done by an agent, in commits, titles, bodies, comments, or docs).
 
