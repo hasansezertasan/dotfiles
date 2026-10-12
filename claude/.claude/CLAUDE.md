@@ -74,13 +74,16 @@ which doesn't need the session model.
 ### Context hygiene
 
 Every tool call re-reads the whole session context, so a session that has grown large
-makes each later step expensive and shortens the 5-hour window.
+makes each later step expensive and can use the available allowance sooner
+within a plan's fixed five-hour reset period.
 At a phase boundary, if the session already holds a lot
 (many large file reads, subagent reports or CI logs, or well over 100 tool calls),
 ask with `AskUserQuestion` whether to start fresh
 before beginning the next phase.
 Offer **Fresh session** (write a short handoff note first: goal, branch, decisions, what remains),
-**/compact**, or **Continue**. Never clear or compact unasked.
+**Continue**, or stop and ask the user to type `/compact` themselves.
+A `/compact` choice inside `AskUserQuestion` is only a tool result, not a command invocation.
+Never clear or compact unasked.
 
 Phase boundaries, for example:
 
