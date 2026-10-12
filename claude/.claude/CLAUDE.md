@@ -71,6 +71,28 @@ run on `model: sonnet` unless the skill names a model.
 Their work is search and fact-finding,
 which doesn't need the session model.
 
+### Context hygiene
+
+Every tool call re-reads the whole session context, so a session that has grown large
+makes each later step expensive and shortens the 5-hour window.
+At a phase boundary, if the session already holds a lot
+(many large file reads, subagent reports or CI logs, or well over 100 tool calls),
+ask with `AskUserQuestion` whether to start fresh
+before beginning the next phase.
+Offer **Fresh session** (write a short handoff note first: goal, branch, decisions, what remains),
+**/compact**, or **Continue**. Never clear or compact unasked.
+
+Phase boundaries, for example:
+
+- investigation done, before implementing
+- implementation green, before review
+- review fixed, before opening the PR
+- each CI/review round while babysitting a PR
+- a plan or spec finished, before executing it
+
+Do not answer "Keep going" or "proceed" with a new fan-out of subagents in a session that is already large;
+raise the same question first.
+
 ## Investigating Git repositories
 
 - When the user provides a Git repository URL, always clone the repository into a fresh temporary directory and investigate its local files.
