@@ -188,8 +188,9 @@ would silently check only the first — hence `xargs -n1`.
 
 ## Agent skills
 
-Project skills are declared in `skills-lock.json`. Restore their generated,
-gitignored files with:
+Project skills are declared in `skills-lock.json` and their generated files
+under `.agents/skills/` are tracked as `linguist-generated` content (see
+`.gitattributes`) — do not edit them by hand. Regenerate them with:
 
 ```sh
 npx skills experimental_install
