@@ -18,6 +18,11 @@ that hints the work was done by an AI agent
 — in commit messages, PR titles/descriptions, code comments, or documentation —
 unless explicitly told to do so.
 
+Never comment on an issue or PR, file an issue, or open a PR
+without the user's explicit approval for that specific action.
+Draft the text, show it,
+and ask for approval with the AskUserQuestion tool before posting.
+
 ## Conventions
 
 Apply these in every project
@@ -57,3 +62,18 @@ A regex manager that has to keep two hand-written copies of a version in sync
 is a sign the duplication is the real bug.
 When one is genuinely unavoidable,
 its `description` must say why no native manager fits.
+
+### Subagent models
+
+Research and other reading-heavy subagents
+(e.g. `mattpocock-skills:research`, Wayfinder research)
+run on `model: sonnet` unless the skill names a model.
+Their work is search and fact-finding,
+which doesn't need the session model.
+
+## Investigating Git repositories
+
+- When the user provides a Git repository URL, always clone the repository into a fresh temporary directory and investigate its local files.
+- Use local tools such as `rg`, `rg --files`, and direct file reads for repository file discovery and investigation. Do not use web searches, GitHub web pages, or `gh` merely to discover or read repository files.
+- If cloning fails because of access, authentication, or network issues, report the blocker rather than silently switching to web search or `gh` for file discovery.
+- Use web browsing or `gh` only when the task needs information outside the cloned files, such as externaldocumentation, issues, pull requests, or repository metadata, or when the user explicitly requests it.
