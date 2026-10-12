@@ -4,7 +4,9 @@
 
 This repository requires Conventional Commits for commit messages and pull
 request titles, as well as Conventional Branch naming (`<type>/<description>`).
-While local pre-flight checks (`claude/.claude/skills/pr/`) assist contributors
+While local pre-flight checks (formerly the vendored
+`claude/.claude/skills/pr/`, removed in
+[ADR 0020](0020-remove-vendored-pr-skill.md)) assist contributors
 before pushing, the repository lacked server-side GitHub Actions checks to
 enforce these standards on incoming pull requests. Without automated CI gates,
 malformed PR titles and branch names must be caught manually during review.
