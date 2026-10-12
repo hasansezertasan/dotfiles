@@ -309,6 +309,54 @@ test_recreated_hook_file_is_recovered() {
   rm -rf "${fixture}"
 }
 
+test_stale_pr_skill_links_are_dropped() {
+  echo "pr skill links left by the removed vendored skill are dropped"
+  local home
+  home="$(make_home)"
+  # Exactly what an earlier revision left behind: links into the deleted
+  # claude/.claude/skills/pr files, now dangling, plus a real file an
+  # unrelated skill keeps beside them.
+  mkdir -p "${home}/.claude/skills/pr/scripts" "${home}/.claude/skills/other"
+  ln -s "${DOTFILES_DIR}/claude/.claude/skills/pr/SKILL.md" "${home}/.claude/skills/pr/SKILL.md"
+  ln -s "${DOTFILES_DIR}/claude/.claude/skills/pr/scripts/preflight.sh" "${home}/.claude/skills/pr/scripts/preflight.sh"
+  ln -s "${DOTFILES_DIR}/claude/.claude/skills/pr/scripts/test_preflight.sh" "${home}/.claude/skills/pr/scripts/test_preflight.sh"
+  printf '%s\n' 'other' > "${home}/.claude/skills/other/SKILL.md"
+
+  run_link "${home}" install > /dev/null
+
+  local rel
+  for rel in .claude/skills/pr/SKILL.md .claude/skills/pr/scripts/preflight.sh .claude/skills/pr/scripts/test_preflight.sh; do
+    if [ -e "${home}/${rel}" ] || [ -L "${home}/${rel}" ]; then
+      fail "the stale pr skill link ${rel} survived install"
+    fi
+  done
+  if [ -e "${home}/.claude/skills/pr/scripts" ] || [ -e "${home}/.claude/skills/pr" ]; then
+    fail "the emptied pr skill directories survived install"
+  fi
+  if [ ! -f "${home}/.claude/skills/other/SKILL.md" ]; then
+    fail "an unrelated skill file was removed with the pr skill cleanup"
+  fi
+
+  rm -rf "${home}"
+}
+
+test_unrelated_pr_skill_link_survives() {
+  echo "a pr skill link owned by something else is left alone"
+  local home
+  home="$(make_home)"
+  mkdir -p "${home}/.claude/skills/pr" "${home}/elsewhere"
+  printf '%s\n' 'elsewhere' > "${home}/elsewhere/SKILL.md"
+  ln -s "${home}/elsewhere/SKILL.md" "${home}/.claude/skills/pr/SKILL.md"
+
+  run_link "${home}" install > /dev/null
+
+  if [ ! -L "${home}/.claude/skills/pr/SKILL.md" ]; then
+    fail "an unrelated pr skill link was deleted"
+  fi
+
+  rm -rf "${home}"
+}
+
 test_usage_is_rejected() {
   echo "an unknown subcommand exits non-zero"
   local home
@@ -335,6 +383,8 @@ test_conflict_is_refused
 test_stale_codex_hook_link_is_dropped
 test_unrelated_dangling_link_survives
 test_recreated_hook_file_is_recovered
+test_stale_pr_skill_links_are_dropped
+test_unrelated_pr_skill_link_survives
 test_usage_is_rejected
 
 if [ "${failures}" -ne 0 ]; then

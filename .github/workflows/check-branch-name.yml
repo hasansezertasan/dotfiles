@@ -31,8 +31,7 @@ jobs:
         run: |
           # Conventional Branch (https://conventionalbranch.org/): a type prefix
           # followed by a short description. In this repository, allowed types are
-          # the 5 Conventional Branch purpose types aligned with preflight.sh and
-          # claude/.claude/skills/pr/SKILL.md (agent prefixes and short types like feat
+          # the 5 Conventional Branch purpose types (agent prefixes and short types like feat
           # are excluded; descriptions are lowercase alphanumerics and hyphens only).
           # renovate/* and release-please--* are whitelisted so the automated
           # dependency and release PRs are never blocked by this check.

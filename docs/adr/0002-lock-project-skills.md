@@ -31,3 +31,6 @@ files when needed.
 ## Related Research
 
 * [MADR skill selection](../research/0002-madr-skill-selection.md)
+
+Superseded by [ADR 0019](0019-track-generated-project-skills.md): generated
+`.agents/skills/` files are now tracked as `linguist-generated` content.
