@@ -104,8 +104,7 @@ codex_hook_link_is_stale() {
   [ "$(codex_hook_link_target)" = "$(lexical_path "${CODEX_HOOK_FORMER_TARGET}")" ]
 }
 
-drop_stale_codex_hook_link() {
-  codex_hook_link_is_stale || return 0
+drop_stale_codex_hook_link() {  codex_hook_link_is_stale || return 0
   local target
   target="$(codex_hook_link_target)"
   rm -- "${CODEX_HOOK_LINK}"
@@ -117,6 +116,42 @@ drop_stale_codex_hook_link() {
     rmdir -- "$(dirname -- "${target}")" 2>/dev/null || :
     rmdir -- "$(dirname -- "$(dirname -- "${target}")")" 2>/dev/null || :
   fi
+}
+
+# ADR 0020 removed the vendored pr skill from the claude package. A machine
+# linked by an earlier revision still has ~/.claude/skills/pr/... links
+# pointing at the deleted files, and Stow is no longer told about them, so it
+# never cleans those links up. Skill files are only read, so unlike the Codex
+# hook there is no write-through content to recover — dropping the stale
+# links and any directories left empty is enough.
+readonly -a PR_SKILL_FORMER_FILES=(
+  .claude/skills/pr/SKILL.md
+  .claude/skills/pr/scripts/preflight.sh
+  .claude/skills/pr/scripts/test_preflight.sh
+)
+
+pr_skill_link_is_stale() {
+  local link="$1" former="$2" value target
+  [ -L "${link}" ] || return 1
+  value="$(readlink -- "${link}")"
+  case "${value}" in
+    /*) target="$(lexical_path "${value}")" ;;
+    *) target="$(lexical_path "$(dirname -- "${link}")/${value}")" ;;
+  esac
+  [ "${target}" = "$(lexical_path "${former}")" ]
+}
+
+drop_stale_pr_skill_links() {
+  local rel link former
+  for rel in ${PR_SKILL_FORMER_FILES[@]+"${PR_SKILL_FORMER_FILES[@]}"}; do
+    link="${TARGET_DIR}/${rel}"
+    former="${DOTFILES_DIR}/claude/${rel}"
+    pr_skill_link_is_stale "${link}" "${former}" || continue
+    rm -- "${link}"
+  done
+  # rmdir only removes empty directories, so unrelated content is safe.
+  rmdir -- "${TARGET_DIR}/.claude/skills/pr/scripts" 2>/dev/null || :
+  rmdir -- "${TARGET_DIR}/.claude/skills/pr" 2>/dev/null || :
 }
 
 case "${1:-}" in
@@ -133,6 +168,7 @@ case "${1:-}" in
       preflight_non_agents
     fi
     drop_stale_codex_hook_link
+    drop_stale_pr_skill_links
     adopt_skill_lock
     run_stow
     ;;
@@ -141,11 +177,13 @@ case "${1:-}" in
       preflight_non_agents --restow
     fi
     drop_stale_codex_hook_link
+    drop_stale_pr_skill_links
     adopt_skill_lock
     run_stow --restow
     ;;
   uninstall)
     drop_stale_codex_hook_link
+    drop_stale_pr_skill_links
     run_stow --delete
     ;;
   *)
