@@ -25,9 +25,10 @@ Chosen option: "Canonical copy in `.agents/skills/`, symlinked from
 Codex read natively, and Claude Code only needs a symlink. This mirrors how
 `~/.claude/skills/` already points into `~/.agents/skills/` globally.
 
-Both skills set `disable-model-invocation: true`, preserving the
-manual-only behaviour they had as commands (`add-stow-package` replaces files
-in `$HOME`). Because they are not listed in `skills-lock.json`, the two skill
+Both skills are manual-only, as they were as commands (`add-stow-package`
+replaces files in `$HOME`). Each agent has its own switch: `SKILL.md` sets
+Claude Code's `disable-model-invocation: true`, and `agents/openai.yaml` sets
+Codex's `policy.allow_implicit_invocation: false`. Because they are not listed in `skills-lock.json`, the two skill
 directories are excluded from the `linguist-generated` rule in
 `.gitattributes` so reviews show their diffs.
 
