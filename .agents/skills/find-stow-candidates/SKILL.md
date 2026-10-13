@@ -170,7 +170,7 @@ End the research doc with a clear action list:
 **Not viable** (unsafe or no portable config):
 - `toolname` — reason
 
-Then tell the user which candidates are ready for the `add-stow-package` skill (`/add-stow-package` in Claude Code and opencode, `$add-stow-package` in Codex).
+Then tell the user which candidates are ready for the `add-stow-package` skill, and say that skill must be invoked explicitly by name (each agent has its own syntax).
 
 ## Step 8 — Commit
 
