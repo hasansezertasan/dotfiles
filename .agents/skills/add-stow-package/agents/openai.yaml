@@ -1,0 +1,5 @@
+interface:
+  display_name: "Add Stow Package"
+  short_description: "Add a tool's config as a GNU Stow package"
+policy:
+  allow_implicit_invocation: false

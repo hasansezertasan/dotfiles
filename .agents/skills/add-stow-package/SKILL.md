@@ -1,3 +1,9 @@
+---
+name: add-stow-package
+description: "Add one or more tools' configuration to this dotfiles repo as GNU Stow packages: inventory the config, verify symlink write-through, wire link.sh and link_test.sh, install, and write the research doc and ADR. Use when the user asks to add, manage, or stow a tool's config in this repository."
+disable-model-invocation: true
+---
+
 # Add a Stow Package
 
 Add one or more tools' configuration to this dotfiles repository as GNU Stow
