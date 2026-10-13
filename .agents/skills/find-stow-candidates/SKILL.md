@@ -1,3 +1,9 @@
+---
+name: find-stow-candidates
+description: "Scan $HOME for tools whose configuration could become a new Stow package in this dotfiles repo, and write a research doc with an inventory table, symlink safety assessment, and next steps. Use when the user asks what else could be stowed or tracked in this repository."
+disable-model-invocation: true
+---
+
 # Find Stow Candidates
 
 Scan `$HOME` for tools whose configuration could become a new Stow package in

@@ -195,3 +195,7 @@ under `.agents/skills/` are tracked as `linguist-generated` content (see
 ```sh
 npx skills experimental_install
 ```
+
+Hand-authored project skills (`add-stow-package`, `find-stow-candidates`) also
+live in `.agents/skills/` so opencode and Codex can read them; `.claude/skills/`
+holds symlinks to them for Claude Code (see ADR 0024).
