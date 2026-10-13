@@ -96,7 +96,7 @@ For each remaining candidate, determine:
    create a scratch dir, symlink a config file into it, use the tool's own
    command to change a setting, verify the link survived. Use a side-effect-free
    write command and redirect all tool state (env vars, caches) into the scratch
-   dir — see `/add-stow-package` Step 2 for the full isolated template.
+   dir — see the `add-stow-package` skill, Step 2, for the full isolated template.
 
 Categorize each tool. For tools with **multiple writable files**, test each
 file individually — a tool can write through one symlink and replace another.
@@ -170,7 +170,7 @@ End the research doc with a clear action list:
 **Not viable** (unsafe or no portable config):
 - `toolname` — reason
 
-Then tell the user which candidates are ready for `/add-stow-package`.
+Then tell the user which candidates are ready for the `add-stow-package` skill (`/add-stow-package` in Claude Code and opencode, `$add-stow-package` in Codex).
 
 ## Step 8 — Commit
 
