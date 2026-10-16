@@ -1,5 +1,0 @@
-# Project skill content below is regenerated from skills-lock.json — do not edit by hand.
-# Hand-authored skills (not in skills-lock.json) are carved out; see ADR 0024.
-.agents/skills/** linguist-generated=true
-.agents/skills/add-stow-package/** -linguist-generated
-.agents/skills/find-stow-candidates/** -linguist-generated

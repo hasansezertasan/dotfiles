@@ -185,17 +185,3 @@ Zsh fragment is covered without editing the workflow.
 `zsh -n` needs one invocation per file. It reads a single script and treats any
 further arguments as positional parameters, so passing several files at once
 would silently check only the first — hence `xargs -n1`.
-
-## Agent skills
-
-Project skills are declared in `skills-lock.json` and their generated files
-under `.agents/skills/` are tracked as `linguist-generated` content (see
-`.gitattributes`) — do not edit them by hand. Regenerate them with:
-
-```sh
-npx skills experimental_install
-```
-
-Hand-authored project skills (`add-stow-package`, `find-stow-candidates`) also
-live in `.agents/skills/` so opencode and Codex can read them; `.claude/skills/`
-holds symlinks to them for Claude Code (see ADR 0024).
