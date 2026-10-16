@@ -1,5 +1,7 @@
 [tools]
 bun = "1.4.3"
+clojure = "latest"
 copier = "9.18.2"
 gcloud = "581.0.0"
+java = "latest"
 uv = "0.13.0"
