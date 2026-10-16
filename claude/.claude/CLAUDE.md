@@ -96,6 +96,16 @@ Phase boundaries, for example:
 Do not answer "Keep going" or "proceed" with a new fan-out of subagents in a session that is already large;
 raise the same question first.
 
+### Review effort
+
+Run code reviews (`/code-review`, `code-review:code-review`, review subagents) at `high` or below.
+Never use `max` or `xhigh` without asking first with `AskUserQuestion`,
+and name the level explicitly instead of letting a skill reuse the last one.
+`max` fans out into ten or more finder agents plus verifiers,
+each re-reading hundreds of thousands of tokens of context on every call,
+and in measured sessions it was about 90% of the tokens.
+When asked for several reviews of one diff, run one reviewer unless the change is risky.
+
 ## Investigating Git repositories
 
 - When the user provides a Git repository URL, always clone the repository into a fresh temporary directory and investigate its local files.
