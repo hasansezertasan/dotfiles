@@ -140,10 +140,10 @@ ls -l ~/.config/zed/settings.json
 The `delegate-skills` package manages `~/.config/delegate-skills/config.json`,
 a read-only configuration file for delegate-fleet lane settings.
 
-Codex is not managed. Its hook definition was a package until the installer
-that writes `~/.codex/hooks.json` proved to rewrite `$HOME` into an absolute
-user path on every run; see ADR 0017. Authentication, history, sessions,
-databases, caches, and `config.toml` were already excluded.
+Codex's `hooks.json` is not managed. Its hook definition was a package until
+the installer that writes `~/.codex/hooks.json` proved to rewrite `$HOME` into an
+absolute user path on every run; see ADR 0017. Authentication, history,
+sessions, databases, caches, and `config.toml` were already excluded.
 
 ### Zsh
 

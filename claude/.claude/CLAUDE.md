@@ -22,7 +22,10 @@ unless explicitly told to do so.
 Never comment on an issue or PR, file an issue, or open a PR
 without the user's explicit approval for that specific action.
 Draft the text, show it,
-and ask for approval with the AskUserQuestion tool before posting.
+and ask for approval with the agent's native question tool
+(`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `question` in opencode)
+before posting.
+If no question tool is available, ask in chat and wait for the answer.
 Typing `/pr` is that approval for opening the PR it describes,
 as long as the diff has not changed since and no review finding is unresolved;
 otherwise ask first.
@@ -120,8 +123,9 @@ Do not stop at a fix or a verdict, and do not wait for the user to type "reply a
 For each item, draft the reply
 (what was done and the commit, or why it is declined, with the evidence),
 show it,
-and ask with `AskUserQuestion` using **Reply and resolve** as the first option,
-alongside **Reply only**, **Edit the text**, and **Skip**.
+and ask with the same native question tool using **Reply and resolve** as the first option,
+alongside **Reply only** and **Skip**.
+Edits to the text come back as free-form input.
 Batch several items into one question when they are independent,
 showing every draft.
 

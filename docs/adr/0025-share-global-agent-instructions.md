@@ -40,7 +40,9 @@ its own, and that a delegated watcher only reports. Editing or forking the skill
 was rejected because some are generated content that an update can overwrite,
 and the user preferred one global statement.
 
-opencode needs no link because it falls back to `~/.claude/CLAUDE.md`. pi
+opencode needs no link because its current docs say it falls back to
+`~/.claude/CLAUDE.md`. Whether opencode V2 keeps that fallback is unverified;
+if it does not, an `AGENTS.md` link in the `opencode` package is the remedy. pi
 (`~/.pi/agent/AGENTS.md`) and Antigravity are left unlinked: pi is a follow-up,
 and Antigravity's global `AGENTS.md` support is unverified.
 

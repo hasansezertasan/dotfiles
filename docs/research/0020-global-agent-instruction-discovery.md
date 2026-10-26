@@ -6,7 +6,7 @@ Research snapshot: 2026-10-26.
 
 `claude/.claude/CLAUDE.md` is the single hand-edited source of global agent
 instructions. Codex needs its own link to read it, opencode already reads it
-through a documented fallback, pi needs its own link, and Antigravity's global
+through a documented fallback (not confirmed for opencode V2), pi needs its own link, and Antigravity's global
 `AGENTS.md` support is unverified. Separately, two vendored skills tell the
 agent to reply to and resolve review threads without asking, which conflicts
 with the approval gate recorded in ADR 0022.
@@ -17,7 +17,7 @@ with the approval gate recorded in ADR 0022.
 | --- | --- | --- | --- |
 | Claude Code | `~/.claude/CLAUDE.md` | Native | Linked by the `claude` package |
 | Codex | `~/.codex/AGENTS.md` | No | Was a hand-made absolute link; now the `codex` package |
-| opencode | `~/.config/opencode/AGENTS.md` | Yes, only when its own file is missing | No link needed; `OPENCODE_DISABLE_CLAUDE_CODE=1` disables the fallback |
+| opencode | `~/.config/opencode/AGENTS.md` | Yes, only when its own file is missing, per the current docs; whether V2 keeps the fallback is unverified | No link needed while the fallback holds; `OPENCODE_DISABLE_CLAUDE_CODE=1` disables it. If V2 drops it, link `~/.config/opencode/AGENTS.md` from the `opencode` package |
 | pi | `~/.pi/agent/AGENTS.md` | No | Not linked yet |
 | Antigravity | `~/.gemini/GEMINI.md`, possibly `~/.gemini/AGENTS.md` | Unknown | Third-party sources only; not linked |
 
