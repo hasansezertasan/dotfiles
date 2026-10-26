@@ -39,7 +39,7 @@ default handler for a list of file types, which needs the app present.
 
 Configuration is grouped into explicit Stow packages. The link script currently
 manages `agents`, `atuin`, `claude`, `codex`, `delegate-skills`, `gh`, `git`,
-`mise`, `olink`, `opencode`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
+`mise`, `olink`, `opencode`, `pi`, `ssh`, `zed`, and `zsh`; it intentionally does not discover packages so that
 adding a directory to the repository cannot unexpectedly change `$HOME`.
 
 Preview changes before installing:
@@ -116,6 +116,11 @@ the `claude` package's `CLAUDE.md` so Codex reads the same global instructions.
 It does not manage `hooks.json` (ADR 0017). A hand-made `~/.codex/AGENTS.md`
 link is a conflict: remove it once, then run `./link.sh install`.
 
+The `pi` package manages only `~/.pi/agent/AGENTS.md`, a link to the `claude`
+package's `CLAUDE.md`. Authentication, models, sessions, extensions, and
+settings in `~/.pi/agent` stay untracked. As with `codex`, a hand-made link at
+that path is a conflict: remove it once, then run `./link.sh install`.
+
 The `ssh` package manages only `~/.ssh/config`. Private keys, host keys,
 `known_hosts`, sockets, and other machine-maintained SSH data must remain
 untracked. The repository ignore rules allow only the config file inside this
@@ -123,7 +128,8 @@ package.
 
 The `olink` package manages `~/.config/olink/pins.json`.
 
-The `opencode` package manages the canonical global `opencode.jsonc` and the
+The `opencode` package manages the canonical global `opencode.jsonc`, an
+`AGENTS.md` link to the `claude` package's `CLAUDE.md`, and the
 dependency manifest used by locally installed plugins. OpenCode automatically
 loads JavaScript files from `~/.config/opencode/plugins`, so the Open Island
 plugin, its installer marker, and `node_modules` remain application-managed.
