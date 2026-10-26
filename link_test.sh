@@ -18,12 +18,14 @@ readonly -a EXPECTED_LINKS=(
   .config/gh/config.yml
   .config/mise/config.toml
   .config/olink/pins.json
+  .config/opencode/AGENTS.md
   .config/opencode/opencode.jsonc
   .config/opencode/package.json
   .config/zed/settings.json
   .config/zsh/conf.d/00-path.zsh
   .config/zsh/conf.d/10-oh-my-zsh.zsh
   .gitconfig
+  .pi/agent/AGENTS.md
   .ssh/config
   .zshrc
 )
@@ -44,6 +46,8 @@ readonly -a EXPECTED_DIRS=(
   .config/zed
   .config/zsh
   .config/zsh/conf.d
+  .pi
+  .pi/agent
   .ssh
 )
 
