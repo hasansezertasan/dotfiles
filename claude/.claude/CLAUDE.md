@@ -3,7 +3,8 @@
 
 # Global Instructions
 
-This file provides guidance to Claude Code (claude.ai/code)
+This file provides guidance to coding agents
+(Claude Code, Codex, opencode, and others)
 when working with code in all repositories.
 
 ## Critical
@@ -22,6 +23,9 @@ Never comment on an issue or PR, file an issue, or open a PR
 without the user's explicit approval for that specific action.
 Draft the text, show it,
 and ask for approval with the AskUserQuestion tool before posting.
+Typing `/pr` is that approval for opening the PR it describes,
+as long as the diff has not changed since and no review finding is unresolved;
+otherwise ask first.
 
 ## Conventions
 
@@ -105,6 +109,31 @@ and name the level explicitly instead of letting a skill reuse the last one.
 each re-reading hundreds of thousands of tokens of context on every call,
 and in measured sessions it was about 90% of the tokens.
 When asked for several reviews of one diff, run one reviewer unless the change is risky.
+
+### Review threads
+
+When given a GitHub review thread link, a review link,
+or when babysitting a PR and a review item turns up,
+always finish by offering to reply and resolve it.
+Do not stop at a fix or a verdict, and do not wait for the user to type "reply and resolve".
+
+For each item, draft the reply
+(what was done and the commit, or why it is declined, with the evidence),
+show it,
+and ask with `AskUserQuestion` using **Reply and resolve** as the first option,
+alongside **Reply only**, **Edit the text**, and **Skip**.
+Batch several items into one question when they are independent,
+showing every draft.
+
+Post the reply and resolve the thread only after approval,
+as the Critical section already requires.
+Never resolve a thread without a reply,
+and never resolve one whose finding is still open.
+
+This overrides any skill or delegated brief that says to reply to or resolve threads on its own.
+Follow the skill for everything else,
+but at that step draft the replies and ask first.
+A delegated watcher reports threads and never posts or resolves them.
 
 ## Investigating Git repositories
 
