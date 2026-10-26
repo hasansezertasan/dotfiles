@@ -102,6 +102,16 @@ which hold no credentials, and is a further reason to keep `hosts.yml` out.
 
 ### Additional tool configuration
 
+The `claude` package links the global instructions as `~/.claude/rules/AGENTS.md`.
+Claude Code loads user-level rules for every project; its automatic `AGENTS.md`
+discovery applies to project paths, not `~/.claude/AGENTS.md`.
+The `codex`, `pi`, and `opencode` packages link their own `AGENTS.md` to that
+same file. When upgrading from the former `CLAUDE.md` path, remove the old
+`~/.claude/CLAUDE.md` symlink after confirming it points into this repository,
+then run `./link.sh restow`. The `codex`, `pi`, and `opencode` links change
+target in the same step, which Stow treats as a conflict: remove those three
+links once as well.
+
 The `agents` package manages only `~/.agents/.skill-lock.json`, the portable
 manifest used by the `skills` CLI to restore globally installed skills. The
 generated `~/.agents/skills/` content remains local and ignored. The CLI writes
@@ -112,12 +122,12 @@ manifest, `link.sh check` previews its adoption and `link.sh install` or
 symlink; the local manifest is therefore preserved as the source of truth.
 
 The `codex` package manages only `~/.codex/AGENTS.md`, a link that resolves to
-the `claude` package's `CLAUDE.md` so Codex reads the same global instructions.
+the `claude` package's `rules/AGENTS.md` so Codex reads the same global instructions.
 It does not manage `hooks.json` (ADR 0017). A hand-made `~/.codex/AGENTS.md`
 link is a conflict: remove it once, then run `./link.sh install`.
 
 The `pi` package manages only `~/.pi/agent/AGENTS.md`, a link to the `claude`
-package's `CLAUDE.md`. Authentication, models, sessions, extensions, and
+package's `rules/AGENTS.md`. Authentication, models, sessions, extensions, and
 settings in `~/.pi/agent` stay untracked. As with `codex`, a hand-made link at
 that path is a conflict: remove it once, then run `./link.sh install`.
 
@@ -129,7 +139,7 @@ package.
 The `olink` package manages `~/.config/olink/pins.json`.
 
 The `opencode` package manages the canonical global `opencode.jsonc`, an
-`AGENTS.md` link to the `claude` package's `CLAUDE.md`, and the
+`AGENTS.md` link to the `claude` package's `rules/AGENTS.md`, and the
 dependency manifest used by locally installed plugins. OpenCode automatically
 loads JavaScript files from `~/.config/opencode/plugins`, so the Open Island
 plugin, its installer marker, and `node_modules` remain application-managed.

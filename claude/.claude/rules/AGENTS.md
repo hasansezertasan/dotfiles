@@ -33,7 +33,7 @@ otherwise ask first.
 ## Conventions
 
 Apply these in every project
-unless the project's own `CLAUDE.md` overrides them.
+unless the project's own instructions override them.
 
 ### Branch names
 
