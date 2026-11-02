@@ -11,7 +11,7 @@ readonly DOTFILES_DIR
 # Paths the packages are expected to place in the target directory.
 readonly -a EXPECTED_LINKS=(
   .agents/.skill-lock.json
-  .claude/CLAUDE.md
+  .claude/rules/AGENTS.md
   .codex/AGENTS.md
   .config/atuin/config.toml
   .config/delegate-skills/config.json
@@ -35,6 +35,7 @@ readonly -a EXPECTED_LINKS=(
 readonly -a EXPECTED_DIRS=(
   .agents
   .claude
+  .claude/rules
   .codex
   .config
   .config/atuin
