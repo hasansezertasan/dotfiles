@@ -113,6 +113,12 @@ each re-reading hundreds of thousands of tokens of context on every call,
 and in measured sessions it was about 90% of the tokens.
 When asked for several reviews of one diff, run one reviewer unless the change is risky.
 
+### GitHub voice
+
+Load the `github-voice` skill before drafting any GitHub comment, reply, review body or issue text.
+If the skill cannot be loaded, tell the user before drafting.
+The approval rule in Critical still applies.
+
 ### Review threads
 
 When given a GitHub review thread link, a review link,
