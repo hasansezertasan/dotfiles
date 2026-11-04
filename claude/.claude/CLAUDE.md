@@ -116,6 +116,7 @@ When asked for several reviews of one diff, run one reviewer unless the change i
 ### GitHub voice
 
 Load the `github-voice` skill before drafting any GitHub comment, reply, review body or issue text.
+If the skill cannot be loaded, tell the user before drafting.
 The approval rule in Critical still applies.
 
 ### Review threads
