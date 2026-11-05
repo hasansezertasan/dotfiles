@@ -145,6 +145,29 @@ Follow the skill for everything else,
 but at that step draft the replies and ask first.
 A delegated watcher reports threads and never posts or resolves them.
 
+### Slack messages
+
+Write every Slack message
+(drafts, replies, canvases, scheduled messages)
+in ELI5 style
+and in [ASD-STE100 Simplified Technical English](https://www.asd-ste100.org/) where practical.
+
+- ELI5: explain as if to a smart reader who is new to the topic.
+  Use plain words and one short example or comparison when it helps.
+  Define a technical term the first time you use it.
+  Do not rewrite text the user asks you to send exactly,
+  such as commands, log lines, and quoted text.
+- STE: use short sentences (about 20 words or fewer).
+  Use the active voice and simple verbs.
+  Use one word for one meaning, and keep the same word for the same thing.
+  Put one idea in each sentence.
+- Put the main point or the needed action first.
+
+Sending, scheduling, and editing a canvas are outward-facing.
+Draft the text, show it,
+and send, schedule, or apply it only after the user approves that specific message or change.
+Prefer a draft (`slack_send_message_draft`) when the user did not ask to send.
+
 ## Investigating Git repositories
 
 - When the user provides a Git repository URL, always clone the repository into a fresh temporary directory and investigate its local files.
