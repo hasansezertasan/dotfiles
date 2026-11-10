@@ -183,7 +183,7 @@ Prefer a draft (`slack_send_message_draft`) when the user did not ask to send.
 Sending, replying to, forwarding, and scheduling an email are outward-facing,
 the same as Slack messages.
 Draft the text, show it,
-and send it only after the user approves that specific email.
+and send, reply to, forward, or schedule it only after the user approves that specific email.
 Prefer a draft (for example Gmail `create_draft`) when the user did not ask to send.
 Approval for one email does not cover the next one or a later edit.
 
