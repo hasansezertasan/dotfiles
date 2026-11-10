@@ -78,6 +78,16 @@ run on `model: sonnet` unless the skill names a model.
 Their work is search and fact-finding,
 which doesn't need the session model.
 
+Implementation subagents
+(implementers and mergers, e.g. in `mattpocock-skills:implement-spec`)
+also run on `model: sonnet` unless the skill or the ticket names a model,
+and at most 3 run in parallel,
+whatever the skill says about maximum concurrency.
+Start the next one when one finishes.
+Each subagent re-reads its whole context on every call,
+so unbounded fan-out multiplies cost without finishing sooner.
+Pass context pointers (spec, ticket, notes), not copies.
+
 ### Context hygiene
 
 Every tool call re-reads the whole session context, so a session that has grown large
@@ -167,6 +177,15 @@ Sending, scheduling, and editing a canvas are outward-facing.
 Draft the text, show it,
 and send, schedule, or apply it only after the user approves that specific message or change.
 Prefer a draft (`slack_send_message_draft`) when the user did not ask to send.
+
+### Emails
+
+Sending, replying to, forwarding, and scheduling an email are outward-facing,
+the same as Slack messages.
+Draft the text, show it,
+and send it only after the user approves that specific email.
+Prefer a draft (for example Gmail `create_draft`) when the user did not ask to send.
+Approval for one email does not cover the next one or a later edit.
 
 ## Investigating Git repositories
 
