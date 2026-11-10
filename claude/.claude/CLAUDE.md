@@ -88,6 +88,11 @@ Each subagent re-reads its whole context on every call,
 so unbounded fan-out multiplies cost without finishing sooner.
 Pass context pointers (spec, ticket, notes), not copies.
 
+`sonnet` applies to Claude Code.
+Agents without it use their own smaller or cheaper model when they can pick one,
+and otherwise inherit the session model.
+The parallel limit applies to every agent.
+
 ### Context hygiene
 
 Every tool call re-reads the whole session context, so a session that has grown large

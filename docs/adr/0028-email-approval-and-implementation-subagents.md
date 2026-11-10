@@ -36,6 +36,11 @@ rule".
   skill or ticket names a model, and at most three run in parallel,
   whatever the skill says. The next one starts when one finishes, and each
   gets context pointers (spec, ticket, notes) instead of copies.
+* **Non-Claude agents.** The same file is linked as the global instructions
+  for Codex, pi, and opencode, which have no `sonnet`. They use their own
+  smaller or cheaper model when they can pick one, and otherwise inherit the
+  session model. The parallel limit applies to every agent. This fallback
+  also covers the research-subagent pin from ADR 0022.
 
 ### Consequences
 
