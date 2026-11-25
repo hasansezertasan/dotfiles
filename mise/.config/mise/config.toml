@@ -1,5 +1,5 @@
 [tools]
-bun = "1.4.4"
+bun = "1.4.5"
 clojure = "latest"
 copier = "9.19.1"
 gcloud = "581.0.0"
